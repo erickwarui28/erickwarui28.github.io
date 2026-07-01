@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="ES_Logo-removebg-preview.png" />
+    <title>Erick Solutions</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e; /* Dark background */
+            color: #e0e0e0; /* Light text for readability */
+        }
+        .header {
+            background: linear-gradient(135deg, #2c2c2c, #0d0d0d); /* Dark gradient background */
+            color: #d4af37; /* Gold-like text */
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Darker shadow */
+        }
+        .header img {
+            max-width: 150px; /* Adjust as needed */
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+        .header p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .card {
+            background-color: #333; /* Dark card background */
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Soft but deep shadow */
+            margin: 20px;
+            padding: 30px;
+            width: 320px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7); /* Enhanced shadow on hover */
+        }
+        .card.featured {
+            background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+            border: 2px solid #d4af37;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card.featured::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .card.featured:hover::before {
+            left: 100%;
+        }
+        .card.featured:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);
+        }
+        .card.featured h3 {
+            color: #d4af37;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            margin-bottom: 20px;
+        }
+        .card.featured p {
+            color: #e0e0e0;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        .card.featured a {
+            background: linear-gradient(135deg, #d4af37, #b7952b);
+            color: #1e1e1e;
+            font-weight: bold;
+            padding: 15px 35px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+        }
+        .card.featured a:hover {
+            background: linear-gradient(135deg, #b7952b, #d4af37);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
+        }
+        .featured-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: linear-gradient(135deg, #d4af37, #b7952b);
+            color: #1e1e1e;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            transform: rotate(15deg);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+        }
+        .card h3 {
+            margin-bottom: 15px;
+            color: #d4af37; /* Gold-like color for headings */
+        }
+        .card p {
+            color: #ccc; /* Light gray for the description */
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .card a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background-color: #d4af37; /* Gold-like button */
+            color: #1e1e1e; /* Dark text on the button */
+            text-decoration: none;
+            border-radius: 25px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); /* Gold shadow */
+        }
+        .card a:hover {
+            background-color: #b7952b; /* Darker gold on hover */
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 40px 20px;
+            gap: 20px;
+        }
+        .link-card {
+            background-color: #2c2c2c; /* Slightly lighter than body */
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .link-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        }
+        .link-card h4 {
+            color: #d4af37;
+            margin: 15px 0;
+            font-size: 20px;
+        }
+        .link-card a {
+            display: inline-block;
+            color: #d4af37;
+            font-size: 16px;
+            text-decoration: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: 1px solid #d4af37;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .link-card a:hover {
+            background-color: #d4af37;
+            color: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="ES_Logo-removebg-preview.png" alt="Erick Solutions Logo">
+        <h1>Erick Solutions</h1>
+        <p>Simplify Ops</p>
+    </div>
+    <div class="container">
+        <!-- <div class="card featured">
+            <div class="featured-badge">Featured</div>
+            <h3>ES-AI CRM WorkSuite</h3>
+            <p>Unify Projects, Clients, and Insights with AI-Driven Precision.</p>
+            <a href="https://ai-crm.ericksolutions.co.ke/" target="_blank">Visit ES-AI CRM WorkSuite</a>
+        </div>
+        <div class="card">
+            <h3>Online Noticeboard</h3>
+            <p>A modern solution for managing and displaying notices online.</p>
+            <a href="https://cnb.ericksolutions.co.ke/" target="_blank">Visit Online Noticeboard</a>
+        </div>
+        <div class="card">
+            <h3>Real Estate Client App</h3>
+            <p>Empower your clients to manage their real estate transactions with ease.</p>
+            <a href="https://rems-client.ericksolutions.co.ke/" target="_blank">Visit Real Estate Client App</a>
+        </div> -->
+        <div class="card">
+            <h3>WWJD - What Would Jesus Do?</h3>
+            <p>Seeking spiritual guidance in your daily life? WWJD Reflections helps you explore biblical wisdom and find answers to life's questions through faith-based perspectives.</p>
+            <a href="https://play.google.com/store/apps/details?id=com.wwjdai.app" target="_blank" rel="noopener noreferrer">📱 Download on Google Play</a>
+        </div>
+    </div>
+    <div class="links">
+        <div class="link-card">
+            <h4>LinkedIn Profile</h4>
+            <a href="https://www.linkedin.com/in/erick-warui-328947100/" target="_blank">View Profile</a>
+        </div>
+        <div class="link-card">
+            <h4>Fiverr Gig</h4>
+            <p>Develop PHP Laravel or CodeIgniter Systems</p>
+            <a href="https://www.fiverr.com/s/bdz28YW" target="_blank">Visit Fiverr</a>
+        </div>
+        <div class="link-card">
+            <h4>Upwork Gig</h4>
+            <p>You will get a great system developed in PHP Laravel or CI</p>
+            <a href="https://www.upwork.com/services/product/development-it-great-system-developed-in-php-laravel-or-ci-1847949839278728481?ref=project_share" target="_blank">Visit Upwork</a>
+        </div>
+        <div class="link-card">
+            <h4>Kwork Gig</h4>
+            <p>Develop PHP Laravel or CodeIgniter Systems</p>
+            <a href="https://kwork.com/web-development/34015101/develop-php-laravel-or-codeigniter-systems" target="_blank">Visit Kwork</a>
+        </div>
+    </div>
+</body>
+</html>
