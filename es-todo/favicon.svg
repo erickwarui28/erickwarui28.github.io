@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#000000"/>
-  <path
-    fill="url(#opGrad)"
-    d="M14.5 33.2c1.1-1.2 2.9-1.3 4.1-.2l7.6 7.1 18.2-24.8c1-1.4 2.9-1.7 4.3-.7 1.4 1 1.7 2.9.7 4.3L28.2 48.1c-1.1 1.5-3.2 1.6-4.4.3L14.3 37.3c-1.2-1.1-1.2-2.9.2-4.1z"
-  />
-  <path
-    fill="#000000"
-    d="M36.2 22.4l2.1 3.4-2.6 1.3 3.8 6.1 2.8-1.4-2.2-3.5 2.7-1.3-2.1-3.4-4.5-1.2z"
-  />
   <defs>
     <linearGradient id="opGrad" x1="18" y1="14" x2="46" y2="50" gradientUnits="userSpaceOnUse">
       <stop stop-color="#86efac"/>
       <stop offset="0.45" stop-color="#22c55e"/>
       <stop offset="1" stop-color="#15803d"/>
     </linearGradient>
+    <mask id="boltMask">
+      <rect width="64" height="64" fill="white"/>
+      <path fill="black" d="M36.2 22.4l2.1 3.4-2.6 1.3 3.8 6.1 2.8-1.4-2.2-3.5 2.7-1.3-2.1-3.4-4.5-1.2z"/>
+    </mask>
   </defs>
+  <path
+    fill="url(#opGrad)"
+    mask="url(#boltMask)"
+    d="M14.5 33.2c1.1-1.2 2.9-1.3 4.1-.2l7.6 7.1 18.2-24.8c1-1.4 2.9-1.7 4.3-.7 1.4 1 1.7 2.9.7 4.3L28.2 48.1c-1.1 1.5-3.2 1.6-4.4.3L14.3 37.3c-1.2-1.1-1.2-2.9.2-4.1z"
+  />
 </svg>
