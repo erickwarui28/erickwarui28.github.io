@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Info - WWJD Admin</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="admin-auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .logout-btn, .back-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+        }
+
+        .info-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-item.positive {
+            border-left-color: #27ae60;
+        }
+
+        .timeline-item.positive::before {
+            background: #27ae60;
+            box-shadow: 0 0 0 2px #27ae60;
+        }
+
+        .timeline-item.negative {
+            border-left-color: #e74c3c;
+        }
+
+        .timeline-item.negative::before {
+            background: #e74c3c;
+            box-shadow: 0 0 0 2px #e74c3c;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .timeline-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .timeline-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .timeline-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+        }
+
+        .timeline-detail-label {
+            color: #666;
+        }
+
+        .timeline-detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .timeline-note {
+            margin-top: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .stat-badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stat-badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stat-badge.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .sort-btn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sort-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .timeline-container {
+            position: relative;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .scroll-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .balance-editor {
+            margin-top: 18px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .balance-editor h3 {
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .balance-editor-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .balance-input {
+            flex: 1;
+            min-width: 180px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .balance-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .balance-save-btn {
+            width: auto;
+            padding: 10px 16px;
+            background: #16a085;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .balance-save-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .balance-status {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>🔐 Admin Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard container" id="dashboard">
+        <div class="header">
+            <h1>📱 Device Information</h1>
+            <div class="header-actions">
+                <button class="back-btn" onclick="window.location.href='index.html'">Back to Dashboard</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Device Info -->
+        <div class="info-section">
+            <h2>Device Details</h2>
+            <div id="deviceInfo" class="loading">Loading device information...</div>
+        </div>
+
+        <!-- Usage Timeline -->
+        <div class="info-section">
+            <h2>Usage Timeline</h2>
+            <div class="timeline-controls">
+                <input type="text" class="search-input" id="timelineSearch" placeholder="Search by type, note, or date...">
+                <button class="sort-btn" id="sortBtn" onclick="toggleSortOrder()">Sort: Oldest First</button>
+            </div>
+            <div class="timeline-container" id="timelineContainer">
+                <div id="usageTimeline" class="loading">Loading usage history...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function logout() {
+            await WWJDAdminAuth.logout();
+        }
+
+        WWJDAdminAuth.wireLoginForm();
+        WWJDAdminAuth.initializeFirebase({
+            onAuthenticated: async function () {
+                await loadDeviceInfo();
+            }
+        }).catch(function (error) {
+            console.error('Firebase init error:', error);
+            alert('Error initializing Firebase Auth. Check firebase-config.js and authorized domains.');
+        });
+
+        let deviceId = null;
+        let currentUserData = null;
+
+        // Timeline state
+        let allTimelineItems = [];
+        let filteredTimelineItems = [];
+        let displayedItems = [];
+        let itemsPerPage = 20;
+        let currentPage = 0;
+        let sortOrder = 'asc'; // 'asc' for oldest first, 'desc' for newest first
+        let isLoadingMore = false;
+
+        function getDeviceIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('deviceId');
+        }
+
+        async function loadDeviceInfo() {
+            deviceId = getDeviceIdFromURL();
+            if (!deviceId) {
+                document.getElementById('deviceInfo').innerHTML = 
+                    '<div class="empty-state">No device ID provided</div>';
+                return;
+            }
+
+            try {
+                // Load user data
+                const userDoc = await window.db.collection('users').doc(deviceId).get();
+                if (!userDoc.exists) {
+                    document.getElementById('deviceInfo').innerHTML = 
+                        '<div class="empty-state">Device not found</div>';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                currentUserData = userData;
+                
+                // Load usage entries
+                const usageEntries = [];
+                try {
+                    const entriesSnapshot = await window.db
+                        .collection('tokenUsage')
+                        .doc(deviceId)
+                        .collection('entries')
+                        .orderBy('createdAt', 'asc')
+                        .get();
+                    
+                    entriesSnapshot.docs.forEach(doc => {
+                        usageEntries.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading usage entries:', error);
+                }
+
+                // Display device info
+                displayDeviceInfo(userData);
+                
+                // Display usage timeline
+                displayUsageTimeline(usageEntries, userData);
+            } catch (error) {
+                console.error('Error loading device info:', error);
+                document.getElementById('deviceInfo').innerHTML = 
+                    '<div class="empty-state" style="color: #e74c3c;">Error loading device information: ' + error.message + '</div>';
+            }
+        }
+
+        function displayDeviceInfo(userData) {
+            const createdAt = userData.createdAt?.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+            const updatedAt = userData.updatedAt?.toDate ? userData.updatedAt.toDate() : new Date(userData.updatedAt);
+            
+            const daysSinceCreated = Math.floor((new Date() - createdAt) / (1000 * 60 * 60 * 24));
+            const daysSinceUpdated = Math.floor((new Date() - updatedAt) / (1000 * 60 * 60 * 24));
+
+            const balance = userData.balance || 0;
+            const messageCount = userData.messageSendCount || 0;
+
+            let balanceBadge = '';
+            if (balance > 1000) {
+                balanceBadge = '<span class="stat-badge success">High Balance</span>';
+            } else if (balance > 100) {
+                balanceBadge = '<span class="stat-badge warning">Moderate Balance</span>';
+            } else {
+                balanceBadge = '<span class="stat-badge danger">Low Balance</span>';
+            }
+
+            document.getElementById('deviceInfo').innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Device ID</div>
+                        <div class="info-value">${deviceId}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Current Balance</div>
+                        <div class="info-value">${balance.toLocaleString()}${balanceBadge}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Messages Sent</div>
+                        <div class="info-value">${messageCount.toLocaleString()}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Account Created</div>
+                        <div class="info-value">${formatDate(createdAt)}<br><small style="color: #999; font-weight: normal;">${daysSinceCreated} days ago</small></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Updated</div>
+                        <div class="info-value">${formatDate(updatedAt)}<br><small style="color: #999; font-weight: normal;">${daysSinceUpdated} days ago</small></div>
+                    </div>
+                </div>
+                <div class="balance-editor">
+                    <h3>Update Device Balance</h3>
+                    <div class="balance-editor-row">
+                        <input
+                            type="number"
+                            id="balanceInput"
+                            class="balance-input"
+                            value="${balance}"
+                            step="1"
+                            min="0"
+                            placeholder="Enter new balance"
+                        >
+                        <button id="saveBalanceBtn" class="balance-save-btn" onclick="updateDeviceBalance()">Save Balance</button>
+                    </div>
+                    <div class="balance-editor-row">
+                        <input
+                            type="text"
+                            id="balanceNoteInput"
+                            class="balance-input"
+                            placeholder="Optional note for audit trail (e.g. admin correction)"
+                        >
+                    </div>
+                    <p id="balanceStatus" class="balance-status">Set a new balance and click Save Balance.</p>
+                </div>
+            `;
+        }
+
+        function setBalanceStatus(message, color) {
+            const statusEl = document.getElementById('balanceStatus');
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.style.color = color || '#666';
+        }
+
+        async function updateDeviceBalance() {
+            if (!WWJDAdminAuth.authReady || !window.db || !deviceId) {
+                setBalanceStatus('Firebase is not ready yet. Please try again.', '#e74c3c');
+                return;
+            }
+
+            const inputEl = document.getElementById('balanceInput');
+            const noteEl = document.getElementById('balanceNoteInput');
+            const saveBtn = document.getElementById('saveBalanceBtn');
+            if (!inputEl || !saveBtn) return;
+
+            const raw = String(inputEl.value || '').trim();
+            const newBalance = Number(raw);
+
+            if (!raw || !Number.isFinite(newBalance)) {
+                setBalanceStatus('Enter a valid numeric balance.', '#e74c3c');
+                return;
+            }
+
+            if (newBalance < 0) {
+                setBalanceStatus('Balance cannot be negative.', '#e74c3c');
+                return;
+            }
+
+            const noteValue = noteEl ? String(noteEl.value || '').trim() : '';
+            saveBtn.disabled = true;
+            setBalanceStatus('Saving balance update...', '#666');
+
+            try {
+                const result = await window.db.runTransaction(async (transaction) => {
+                    const userRef = window.db.collection('users').doc(deviceId);
+                    const userSnap = await transaction.get(userRef);
+                    if (!userSnap.exists) {
+                        throw new Error('Device user record not found.');
+                    }
+
+                    const latestUser = userSnap.data() || {};
+                    const beforeBalance = Number(latestUser.balance || 0);
+                    const delta = newBalance - beforeBalance;
+
+                    transaction.update(userRef, {
+                        balance: newBalance,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+
+                    if (delta !== 0) {
+                        const usageRef = window.db
+                            .collection('tokenUsage')
+                            .doc(deviceId)
+                            .collection('entries')
+                            .doc();
+
+                        transaction.set(usageRef, {
+                            deviceId,
+                            type: 'adjustment',
+                            amount: Math.abs(delta),
+                            delta,
+                            balanceBefore: beforeBalance,
+                            balanceAfter: newBalance,
+                            note: noteValue || 'Manual balance update from device admin page',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                    }
+
+                    return { beforeBalance, delta };
+                });
+
+                currentUserData = {
+                    ...(currentUserData || {}),
+                    balance: newBalance,
+                };
+
+                if (result.delta === 0) {
+                    setBalanceStatus('Balance was already at that value. No adjustment entry created.', '#666');
+                } else {
+                    setBalanceStatus(
+                        `Balance updated: ${result.beforeBalance.toLocaleString()} -> ${newBalance.toLocaleString()} (delta ${result.delta > 0 ? '+' : ''}${result.delta}).`,
+                        '#27ae60'
+                    );
+                }
+
+                await loadDeviceInfo();
+            } catch (error) {
+                console.error('Error updating balance:', error);
+                setBalanceStatus('Failed to update balance: ' + (error.message || 'Unknown error'), '#e74c3c');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        function displayUsageTimeline(usageEntries, userData) {
+            const container = document.getElementById('usageTimeline');
+            
+            if (usageEntries.length === 0 && !userData) {
+                container.innerHTML = '<div class="empty-state">No usage history available</div>';
+                return;
+            }
+
+            // Create a comprehensive timeline including account creation
+            allTimelineItems = [];
+
+            // Add account creation as first item
+            if (userData) {
+                const createdAt = userData.createdAt?.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+                allTimelineItems.push({
+                    type: 'account_created',
+                    date: createdAt,
+                    title: 'Account Created',
+                    balanceAfter: userData.balance || 0,
+                    note: 'Device account was created'
+                });
+            }
+
+            // Add all usage entries
+            usageEntries.forEach(entry => {
+                allTimelineItems.push({
+                    type: 'usage',
+                    date: entry.createdAt?.toDate ? entry.createdAt.toDate() : new Date(entry.createdAt),
+                    title: entry.type || 'Token Usage',
+                    delta: entry.delta || 0,
+                    amount: entry.amount || 0,
+                    balanceBefore: entry.balanceBefore || 0,
+                    balanceAfter: entry.balanceAfter || 0,
+                    note: entry.note || ''
+                });
+            });
+
+            // Initialize timeline display
+            currentPage = 0;
+            displayedItems = [];
+            applyFiltersAndSort();
+            
+            // Set up scroll listener for infinite scroll
+            const timelineContainer = document.getElementById('timelineContainer');
+            timelineContainer.removeEventListener('scroll', handleScroll);
+            timelineContainer.addEventListener('scroll', handleScroll);
+            
+            // Set up search input listener
+            const searchInput = document.getElementById('timelineSearch');
+            searchInput.removeEventListener('input', handleSearch);
+            searchInput.addEventListener('input', handleSearch);
+        }
+
+        function handleSearch() {
+            currentPage = 0;
+            displayedItems = [];
+            applyFiltersAndSort();
+        }
+
+        function toggleSortOrder() {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            const sortBtn = document.getElementById('sortBtn');
+            sortBtn.textContent = sortOrder === 'asc' ? 'Sort: Oldest First' : 'Sort: Newest First';
+            currentPage = 0;
+            displayedItems = [];
+            applyFiltersAndSort();
+        }
+
+        function applyFiltersAndSort() {
+            const searchTerm = document.getElementById('timelineSearch').value.toLowerCase();
+            
+            // Filter items based on search
+            filteredTimelineItems = allTimelineItems.filter(item => {
+                if (!searchTerm) return true;
+                
+                const searchableText = [
+                    item.title || '',
+                    item.note || '',
+                    formatDate(item.date).toLowerCase(),
+                    item.type || '',
+                    (item.delta || 0).toString(),
+                    (item.amount || 0).toString(),
+                    (item.balanceBefore || 0).toString(),
+                    (item.balanceAfter || 0).toString()
+                ].join(' ').toLowerCase();
+                
+                return searchableText.includes(searchTerm);
+            });
+
+            // Sort items
+            filteredTimelineItems.sort((a, b) => {
+                const comparison = a.date.getTime() - b.date.getTime();
+                return sortOrder === 'asc' ? comparison : -comparison;
+            });
+
+            // Reset and load first page
+            renderTimeline();
+        }
+
+        function handleScroll() {
+            const container = document.getElementById('timelineContainer');
+            const scrollTop = container.scrollTop;
+            const scrollHeight = container.scrollHeight;
+            const clientHeight = container.clientHeight;
+
+            // Load more when near bottom (within 200px)
+            if (scrollTop + clientHeight >= scrollHeight - 200 && !isLoadingMore) {
+                loadMoreItems();
+            }
+        }
+
+        function loadMoreItems() {
+            if (isLoadingMore) return;
+            
+            const remainingItems = filteredTimelineItems.length - displayedItems.length;
+            if (remainingItems === 0) {
+                // Remove the "load more" message if no more items
+                const loadingMsg = document.querySelector('.scroll-loading');
+                if (loadingMsg) loadingMsg.remove();
+                return;
+            }
+
+            isLoadingMore = true;
+            
+            const nextBatch = filteredTimelineItems.slice(
+                displayedItems.length,
+                displayedItems.length + itemsPerPage
+            );
+            
+            displayedItems = [...displayedItems, ...nextBatch];
+            renderTimeline();
+            
+            // Small delay to prevent rapid firing
+            setTimeout(() => {
+                isLoadingMore = false;
+            }, 100);
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('usageTimeline');
+            
+            if (filteredTimelineItems.length === 0) {
+                container.innerHTML = '<div class="empty-state">No items match your search</div>';
+                return;
+            }
+
+            // Ensure we have items to display (load initial items if needed)
+            if (displayedItems.length === 0 && filteredTimelineItems.length > 0) {
+                displayedItems = filteredTimelineItems.slice(0, itemsPerPage);
+                currentPage = 1;
+            }
+
+            const hasMore = displayedItems.length < filteredTimelineItems.length;
+
+            container.innerHTML = `
+                <div class="timeline">
+                    ${displayedItems.map(item => renderTimelineItem(item)).join('')}
+                </div>
+                ${hasMore ? '<div class="scroll-loading">Scroll down to load more...</div>' : ''}
+            `;
+        }
+
+        function renderTimelineItem(item) {
+            const isPositive = item.delta > 0;
+            const isNegative = item.delta < 0;
+            const itemClass = item.type === 'account_created' ? 'positive' : (isNegative ? 'negative' : isPositive ? 'positive' : '');
+            
+            return `
+                <div class="timeline-item ${itemClass}">
+                    <div class="timeline-header">
+                        <div class="timeline-title">${escapeHtml(item.title)}</div>
+                        <div class="timeline-date">${formatDate(item.date)}</div>
+                    </div>
+                    ${item.delta !== undefined ? `
+                        <div class="timeline-details">
+                            <div class="timeline-detail-item">
+                                <span class="timeline-detail-label">Delta:</span>
+                                <span class="timeline-detail-value" style="color: ${item.delta < 0 ? '#e74c3c' : '#27ae60'}">
+                                    ${item.delta > 0 ? '+' : ''}${item.delta}
+                                </span>
+                            </div>
+                            <div class="timeline-detail-item">
+                                <span class="timeline-detail-label">Balance Before:</span>
+                                <span class="timeline-detail-value">${item.balanceBefore.toLocaleString()}</span>
+                            </div>
+                            <div class="timeline-detail-item">
+                                <span class="timeline-detail-label">Balance After:</span>
+                                <span class="timeline-detail-value">${item.balanceAfter.toLocaleString()}</span>
+                            </div>
+                            ${item.amount ? `
+                                <div class="timeline-detail-item">
+                                    <span class="timeline-detail-label">Amount:</span>
+                                    <span class="timeline-detail-value">${item.amount.toLocaleString()}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : `
+                        <div class="timeline-details">
+                            <div class="timeline-detail-item">
+                                <span class="timeline-detail-label">Initial Balance:</span>
+                                <span class="timeline-detail-value">${item.balanceAfter.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    `}
+                    ${item.note ? `<div class="timeline-note">${escapeHtml(item.note)}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

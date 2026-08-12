@@ -1,0 +1,26 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer glow circle -->
+  <circle cx="60" cy="60" r="55" fill="#D4AF37" opacity="0.15"/>
+  
+  <!-- Main circle background -->
+  <circle cx="60" cy="60" r="45" fill="#FFF8DC" stroke="#D4AF37" stroke-width="2"/>
+  
+  <!-- Cross -->
+  <g transform="translate(60, 60)">
+    <!-- Vertical bar -->
+    <path d="M -8 -25 L 8 -25 L 8 25 L -8 25 Z" fill="#D4AF37"/>
+    <!-- Horizontal bar -->
+    <path d="M -25 -8 L 25 -8 L 25 8 L -25 8 Z" fill="#D4AF37"/>
+    <!-- Decorative circle in center -->
+    <circle cx="0" cy="0" r="6" fill="#FFF8DC"/>
+  </g>
+  
+  <!-- Decorative rays -->
+  <g transform="translate(60, 60)">
+    <path d="M 0 -50 L 3 -45 L 0 -40 L -3 -45 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M 50 0 L 45 3 L 40 0 L 45 -3 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M 0 50 L -3 45 L 0 40 L 3 45 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M -50 0 L -45 -3 L -40 0 L -45 3 Z" fill="#D4AF37" opacity="0.6"/>
+  </g>
+</svg>
+

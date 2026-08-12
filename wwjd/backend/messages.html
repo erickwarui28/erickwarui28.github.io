@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWJD Messages - Admin</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="admin-auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .logout-btn, .back-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+        }
+
+        /* Contacts List */
+        .contacts-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .contacts-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .contacts-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .contact-item {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .contact-item.unread {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .contact-email {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .contact-device {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .device-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .device-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .contact-meta {
+            text-align: right;
+        }
+
+        .unread-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .contact-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Chat Interface */
+        .chat-section {
+            display: none;
+        }
+
+        .chat-section.active {
+            display: block;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-header h2 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .chat-header-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .chat-messages {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+
+        .message.user {
+            background: #e3f2fd;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.admin {
+            background: #f1f8e9;
+            margin-right: auto;
+        }
+
+        .message-text {
+            color: #333;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .read-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .read-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+
+        .unread-indicator {
+            background: #ff9800;
+        }
+
+        .chat-input-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>🔐 Admin Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard container" id="dashboard">
+        <div class="header">
+            <h1>💬 Contact Messages</h1>
+            <div class="header-actions">
+                <button class="back-btn" onclick="window.location.href='index.html'">Back to Dashboard</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Contacts List View -->
+        <div class="contacts-section" id="contactsView">
+            <h2>📋 All Contacts</h2>
+            <input type="text" class="search-input" id="contactSearch" placeholder="Search by name, email, or device ID...">
+            <div class="contacts-list" id="contactsList">
+                <div class="loading">Loading contacts...</div>
+            </div>
+        </div>
+
+        <!-- Chat View -->
+        <div class="chat-section" id="chatView">
+            <div class="chat-header">
+                <h2 id="chatContactName">Contact Name</h2>
+                <div class="chat-header-info" id="chatContactInfo">Email • Device ID</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="loading">Loading messages...</div>
+            </div>
+
+            <div class="chat-input-container">
+                <textarea class="chat-input" id="messageInput" placeholder="Type your reply..." rows="3"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function logout() {
+            await WWJDAdminAuth.logout();
+        }
+
+        WWJDAdminAuth.wireLoginForm();
+        WWJDAdminAuth.initializeFirebase({
+            onAuthenticated: async function () {
+                await loadContacts();
+            }
+        }).catch(function (error) {
+            console.error('Firebase init error:', error);
+            alert('Error initializing Firebase Auth. Check firebase-config.js and authorized domains.');
+        });
+
+        let currentContactId = null;
+        let messagesUnsubscribe = null;
+
+        // Contacts Management
+        let allContacts = [];
+
+        async function loadContacts() {
+            try {
+                const snapshot = await window.db.collection('contacts')
+                    .orderBy('lastMessageAt', 'desc')
+                    .get();
+                
+                allContacts = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                displayContacts();
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                document.getElementById('contactsList').innerHTML = 
+                    '<div class="loading" style="color: #e74c3c;">Error loading contacts: ' + error.message + '</div>';
+            }
+        }
+
+        function displayContacts() {
+            const searchTerm = document.getElementById('contactSearch').value.toLowerCase();
+            const filtered = allContacts.filter(contact => 
+                contact.name?.toLowerCase().includes(searchTerm) ||
+                contact.email?.toLowerCase().includes(searchTerm) ||
+                contact.deviceId?.toLowerCase().includes(searchTerm)
+            );
+
+            const container = document.getElementById('contactsList');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state">No contacts found</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(contact => {
+                const hasUnread = (contact.adminUnreadCount || 0) > 0;
+                const time = formatTime(contact.lastMessageAt);
+                return `
+                    <div class="contact-item ${hasUnread ? 'unread' : ''}" onclick="openChat('${contact.id}')">
+                        <div class="contact-info">
+                            <div class="contact-name">${contact.name || 'Unknown'}</div>
+                            <div class="contact-email">${contact.email || 'No email'}</div>
+                            <div class="contact-device">${contact.deviceId ? `<a href="device.html?deviceId=${encodeURIComponent(contact.deviceId)}" class="device-link" onclick="event.stopPropagation()">${contact.deviceId}</a>` : 'No device ID'}</div>
+                        </div>
+                        <div class="contact-meta">
+                            ${hasUnread ? `<div class="unread-badge">${contact.adminUnreadCount} unread</div>` : ''}
+                            <div class="contact-time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('contactSearch').addEventListener('input', displayContacts);
+
+        // Chat Management
+        async function openChat(contactId) {
+            currentContactId = contactId;
+            const contact = allContacts.find(c => c.id === contactId);
+            
+            if (!contact) return;
+
+            document.getElementById('chatContactName').textContent = contact.name || 'Unknown';
+            const deviceId = contact.deviceId || 'No device ID';
+            const deviceLink = deviceId !== 'No device ID' 
+                ? `<a href="device.html?deviceId=${encodeURIComponent(deviceId)}" class="device-link">${deviceId}</a>`
+                : deviceId;
+            document.getElementById('chatContactInfo').innerHTML = 
+                `${contact.email || 'No email'} • ${deviceLink}`;
+
+            document.getElementById('contactsView').style.display = 'none';
+            document.getElementById('chatView').classList.add('active');
+
+            await loadMessages(contactId);
+            markAdminMessagesAsRead(contactId);
+        }
+
+        function closeChat() {
+            document.getElementById('contactsView').style.display = 'block';
+            document.getElementById('chatView').classList.remove('active');
+            currentContactId = null;
+            if (messagesUnsubscribe) {
+                messagesUnsubscribe();
+                messagesUnsubscribe = null;
+            }
+        }
+
+        async function loadMessages(contactId) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '<div class="loading">Loading messages...</div>';
+
+            try {
+                const messagesRef = window.db.collection('contacts').doc(contactId).collection('messages');
+                const snapshot = await messagesRef.orderBy('createdAt', 'asc').get();
+                
+                const messages = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                displayMessages(messages);
+
+                // Subscribe to real-time updates
+                if (messagesUnsubscribe) {
+                    messagesUnsubscribe();
+                }
+                messagesUnsubscribe = messagesRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
+                    const updatedMessages = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    displayMessages(updatedMessages);
+                });
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                container.innerHTML = '<div class="loading" style="color: #e74c3c;">Error loading messages</div>';
+            }
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<div class="empty-state">No messages yet</div>';
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => {
+                const time = formatTime(msg.createdAt);
+                const isRead = msg.sender === 'admin' && msg.isRead;
+                return `
+                    <div class="message ${msg.sender}">
+                        <div class="message-text">${escapeHtml(msg.text)}</div>
+                        <div class="message-meta">
+                            <span>${time}</span>
+                            ${msg.sender === 'admin' ? `
+                                <div class="read-status">
+                                    <div class="read-indicator ${isRead ? '' : 'unread-indicator'}"></div>
+                                    <span>${isRead ? 'Read' : 'Unread'}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (!currentContactId) return;
+            
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            try {
+                const contactRef = window.db.collection('contacts').doc(currentContactId);
+                const messagesRef = contactRef.collection('messages');
+                
+                await window.db.runTransaction(async (transaction) => {
+                    const contactSnap = await transaction.get(contactRef);
+                    if (!contactSnap.exists) {
+                        throw new Error('Contact not found');
+                    }
+
+                    const contactData = contactSnap.data();
+                    const now = firebase.firestore.FieldValue.serverTimestamp();
+
+                    const messageRef = messagesRef.doc();
+                    transaction.set(messageRef, {
+                        text: text,
+                        sender: 'admin',
+                        createdAt: now,
+                        readAt: null,
+                        isRead: false,
+                    });
+
+                    transaction.update(contactRef, {
+                        updatedAt: now,
+                        lastMessageAt: now,
+                        unreadCount: (contactData.unreadCount || 0) + 1,
+                        adminUnreadCount: Math.max(0, (contactData.adminUnreadCount || 0) - 1),
+                    });
+                });
+
+                input.value = '';
+                await loadContacts(); // Refresh contacts list
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message: ' + error.message);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+            }
+        }
+
+        async function markAdminMessagesAsRead(contactId) {
+            try {
+                const contactRef = window.db.collection('contacts').doc(contactId);
+                const messagesRef = contactRef.collection('messages');
+                
+                // First, get all messages to find unread user messages
+                const messagesSnap = await messagesRef.get();
+                const unreadUserMessages = messagesSnap.docs.filter(doc => {
+                    const msg = doc.data();
+                    return msg.sender === 'user' && !msg.isRead;
+                });
+                
+                if (unreadUserMessages.length === 0) {
+                    return; // No unread messages to mark
+                }
+                
+                await window.db.runTransaction(async (transaction) => {
+                    // Read contact first (all reads must happen before writes)
+                    const contactSnap = await transaction.get(contactRef);
+                    if (!contactSnap.exists) {
+                        return; // Contact doesn't exist
+                    }
+                    
+                    const contactData = contactSnap.data();
+                    const now = firebase.firestore.FieldValue.serverTimestamp();
+                    const newAdminUnreadCount = Math.max(0, (contactData.adminUnreadCount || 0) - unreadUserMessages.length);
+
+                    // Now do all writes (all reads are done)
+                    unreadUserMessages.forEach(doc => {
+                        transaction.update(doc.ref, {
+                            readAt: now,
+                            isRead: true,
+                        });
+                    });
+
+                    transaction.update(contactRef, {
+                        adminUnreadCount: newAdminUnreadCount,
+                        updatedAt: now,
+                    });
+                });
+
+                await loadContacts(); // Refresh contacts list
+            } catch (error) {
+                console.error('Error marking messages as read:', error);
+            }
+        }
+
+        // Enter key to send message
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diff = now.getTime() - date.getTime();
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh contacts every 30 seconds
+        setInterval(async () => {
+            if (WWJDAdminAuth.currentUser && WWJDAdminAuth.isAdminUser(WWJDAdminAuth.currentUser)) {
+                await loadContacts();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

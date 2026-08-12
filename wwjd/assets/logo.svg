@@ -1,0 +1,30 @@
+<svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon -->
+  <g transform="translate(60, 60)">
+    <!-- Outer glow circle -->
+    <circle cx="0" cy="0" r="50" fill="#D4AF37" opacity="0.15"/>
+    
+    <!-- Main circle background -->
+    <circle cx="0" cy="0" r="40" fill="#FFF8DC" stroke="#D4AF37" stroke-width="2"/>
+    
+    <!-- Cross -->
+    <g>
+      <!-- Vertical bar -->
+      <path d="M -7 -22 L 7 -22 L 7 22 L -7 22 Z" fill="#D4AF37"/>
+      <!-- Horizontal bar -->
+      <path d="M -22 -7 L 22 -7 L 22 7 L -22 7 Z" fill="#D4AF37"/>
+      <!-- Decorative circle in center -->
+      <circle cx="0" cy="0" r="5" fill="#FFF8DC"/>
+    </g>
+    
+    <!-- Decorative rays -->
+    <path d="M 0 -45 L 2.5 -40 L 0 -35 L -2.5 -40 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M 45 0 L 40 2.5 L 35 0 L 40 -2.5 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M 0 45 L -2.5 40 L 0 35 L 2.5 40 Z" fill="#D4AF37" opacity="0.6"/>
+    <path d="M -45 0 L -40 -2.5 L -35 0 L -40 2.5 Z" fill="#D4AF37" opacity="0.6"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="180" y="60" font-size="42" font-weight="bold" fill="#D4AF37" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" letter-spacing="3">WWJD</text>
+</svg>
+
