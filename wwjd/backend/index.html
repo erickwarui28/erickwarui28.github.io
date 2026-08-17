@@ -534,6 +534,7 @@
 
     <script>
         async function logout() {
+            stopRealtimeListeners();
             await WWJDAdminAuth.logout();
         }
 
@@ -541,6 +542,9 @@
         WWJDAdminAuth.initializeFirebase({
             onAuthenticated: async function () {
                 await loadDashboard();
+            },
+            onLoggedOut: function () {
+                stopRealtimeListeners();
             }
         }).catch(function (error) {
             console.error('Firebase init error:', error);
@@ -555,22 +559,93 @@
         let usersPage = 1;
         let usagePage = 1;
         const itemsPerPage = 10;
+        let dashboardUnsubscribers = [];
+
+        function stopRealtimeListeners() {
+            dashboardUnsubscribers.forEach(function (unsub) {
+                try { unsub(); } catch (e) {}
+            });
+            dashboardUnsubscribers = [];
+        }
+
+        function startRealtimeListeners() {
+            stopRealtimeListeners();
+            if (!window.db) return;
+
+            dashboardUnsubscribers.push(window.db.collection('users').onSnapshot(function (snapshot) {
+                allUsers = snapshot.docs.map(function (doc) {
+                    return Object.assign({ id: doc.id }, doc.data());
+                });
+                allUsers.sort(function (a, b) {
+                    const aTime = a.updatedAt?.toDate ? a.updatedAt.toDate().getTime() :
+                                  (a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0);
+                    const bTime = b.updatedAt?.toDate ? b.updatedAt.toDate().getTime() :
+                                  (b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0);
+                    return bTime - aTime;
+                });
+                displayUsers();
+                calculateStats();
+                updateCharts();
+            }, function (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersTableBody').innerHTML =
+                    '<tr><td colspan="6" class="loading" style="color: #e74c3c;">Error: ' + error.message + '</td></tr>';
+            }));
+
+            dashboardUnsubscribers.push(window.db.collectionGroup('entries').onSnapshot(function (snapshot) {
+                allUsage = [];
+                snapshot.docs.forEach(function (entryDoc) {
+                    const data = entryDoc.data();
+                    const pathParts = entryDoc.ref.path.split('/');
+                    const deviceId = pathParts[1];
+                    allUsage.push(Object.assign({
+                        id: entryDoc.id,
+                        deviceId: deviceId || data.deviceId
+                    }, data));
+                });
+                allUsage.sort(function (a, b) {
+                    const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+                    const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+                    return bTime - aTime;
+                });
+                displayUsage();
+                calculateStats();
+                updateCharts();
+            }, function (error) {
+                console.error('Error loading usage:', error);
+                document.getElementById('usageTableBody').innerHTML =
+                    '<tr><td colspan="9" class="loading" style="color: #e74c3c;">Error: ' + error.message + '</td></tr>';
+            }));
+
+            dashboardUnsubscribers.push(window.db.collection('contacts').onSnapshot(function (snapshot) {
+                allContacts = snapshot.docs.map(function (doc) {
+                    return Object.assign({ id: doc.id }, doc.data());
+                });
+            }, function (error) {
+                console.error('Error loading contacts:', error);
+                allContacts = [];
+            }));
+
+            dashboardUnsubscribers.push(window.db.collection('appLogs').orderBy('createdAt', 'desc').limit(100).onSnapshot(function (snapshot) {
+                renderAppLogs(snapshot);
+            }, function (error) {
+                console.error('Error loading app logs:', error);
+                const tbody = document.getElementById('appLogsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="loading" style="color: #e74c3c;">Error loading app logs: ' + escapeHtml(error.message || 'Unknown error') + '</td></tr>';
+                }
+            }));
+        }
 
         async function loadDashboard() {
             try {
-                // Show loading state
                 document.getElementById('usersTableBody').innerHTML = 
                     '<tr><td colspan="6" class="loading">Loading...</td></tr>';
                 document.getElementById('usageTableBody').innerHTML = 
                     '<tr><td colspan="9" class="loading">Loading...</td></tr>';
                 
-                await loadUsers();
-                await loadUsage();
-                await loadContacts();
                 await loadAppSettings();
-                await loadAppLogs();
-                calculateStats();
-                updateCharts();
+                startRealtimeListeners();
             } catch (error) {
                 console.error('Error loading dashboard:', error);
                 if (error.code === 'permission-denied') {
@@ -598,48 +673,35 @@
             }
         }
 
-        async function loadAppLogs() {
-            if (!WWJDAdminAuth.authReady || !window.db) return;
+        function renderAppLogs(snapshot) {
             const tbody = document.getElementById('appLogsTableBody');
             if (!tbody) return;
 
-            try {
-                const snapshot = await window.db
-                    .collection('appLogs')
-                    .orderBy('createdAt', 'desc')
-                    .limit(100)
-                    .get();
+            allAppLogs = snapshot.docs.map(function (doc) {
+                return Object.assign({ id: doc.id }, doc.data());
+            });
 
-                allAppLogs = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                tbody.innerHTML = '';
-                if (allAppLogs.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="loading">No logs found</td></tr>';
-                    return;
-                }
-
-                allAppLogs.forEach(log => {
-                    const row = document.createElement('tr');
-                    const level = (log.level || 'info').toLowerCase();
-                    const levelClass = ['info', 'warn', 'error'].includes(level) ? level : 'info';
-                    const contextText = formatLogContext(log.context);
-                    row.innerHTML = `
-                        <td>${formatDate(log.createdAt)}</td>
-                        <td><span class="log-level ${levelClass}">${escapeHtml(levelClass)}</span></td>
-                        <td>${escapeHtml(log.event || 'N/A')}</td>
-                        <td><a href="device.html?deviceId=${encodeURIComponent(log.deviceId || '')}" class="device-link">${escapeHtml(log.deviceId || 'N/A')}</a></td>
-                        <td>${escapeHtml(log.message || 'N/A')}</td>
-                        <td>${escapeHtml(contextText)}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error loading app logs:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="loading" style="color: #e74c3c;">Error loading app logs: ' + escapeHtml(error.message || 'Unknown error') + '</td></tr>';
+            tbody.innerHTML = '';
+            if (allAppLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">No logs found</td></tr>';
+                return;
             }
+
+            allAppLogs.forEach(function (log) {
+                const row = document.createElement('tr');
+                const level = (log.level || 'info').toLowerCase();
+                const levelClass = ['info', 'warn', 'error'].includes(level) ? level : 'info';
+                const contextText = formatLogContext(log.context);
+                row.innerHTML = `
+                    <td>${formatDate(log.createdAt)}</td>
+                    <td><span class="log-level ${levelClass}">${escapeHtml(levelClass)}</span></td>
+                    <td>${escapeHtml(log.event || 'N/A')}</td>
+                    <td><a href="device.html?deviceId=${encodeURIComponent(log.deviceId || '')}" class="device-link">${escapeHtml(log.deviceId || 'N/A')}</a></td>
+                    <td>${escapeHtml(log.message || 'N/A')}</td>
+                    <td>${escapeHtml(contextText)}</td>
+                `;
+                tbody.appendChild(row);
+            });
         }
 
         async function loadAppSettings() {
@@ -797,126 +859,6 @@
                 statusEl.textContent = 'Saved. Voice calls will use model: ' + model;
             } catch (e) {
                 statusEl.textContent = 'Save failed: ' + e.message;
-            }
-        }
-
-        async function loadContacts() {
-            try {
-                const snapshot = await window.db.collection('contacts').get();
-                allContacts = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-            } catch (error) {
-                console.error('Error loading contacts:', error);
-                allContacts = [];
-            }
-        }
-
-        async function loadUsers() {
-            // Ensure Firebase is initialized
-            if (!WWJDAdminAuth.authReady || !window.db) {
-                await initializeFirebase();
-                if (!window.db) {
-                    document.getElementById('usersTableBody').innerHTML = 
-                        '<tr><td colspan="6" class="loading" style="color: #e74c3c;">Error: Firebase not initialized</td></tr>';
-                    return;
-                }
-            }
-
-            try {
-                const usersSnapshot = await window.db.collection('users').get();
-                allUsers = usersSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                // Sort by updatedAt descending (latest first)
-                allUsers.sort((a, b) => {
-                    const aTime = a.updatedAt?.toDate ? a.updatedAt.toDate().getTime() : 
-                                  (a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0);
-                    const bTime = b.updatedAt?.toDate ? b.updatedAt.toDate().getTime() : 
-                                  (b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0);
-                    return bTime - aTime; // Latest first
-                });
-                
-                displayUsers();
-            } catch (error) {
-                console.error('Error loading users:', error);
-                if (error.code === 'permission-denied') {
-                    alert('Permission denied. Please update Firestore security rules.\n\nSee FIRESTORE_RULES_UPDATE.md for instructions.');
-                } else {
-                    alert('Error loading users: ' + error.message);
-                }
-                document.getElementById('usersTableBody').innerHTML = 
-                    '<tr><td colspan="6" class="loading" style="color: #e74c3c;">Error: ' + error.message + '</td></tr>';
-            }
-        }
-
-        async function loadUsage() {
-            // Ensure Firebase is initialized
-            if (!WWJDAdminAuth.authReady || !window.db) {
-                await initializeFirebase();
-                if (!window.db) {
-                    document.getElementById('usageTableBody').innerHTML = 
-                        '<tr><td colspan="9" class="loading" style="color: #e74c3c;">Error: Firebase not initialized</td></tr>';
-                    return;
-                }
-            }
-
-            allUsage = [];
-            
-            try {
-                // Try using collection group first (more efficient)
-                try {
-                    const entriesSnapshot = await window.db.collectionGroup('entries').get();
-                    entriesSnapshot.docs.forEach(entryDoc => {
-                        const data = entryDoc.data();
-                        // Extract deviceId from the document path: tokenUsage/{deviceId}/entries/{entryId}
-                        const pathParts = entryDoc.ref.path.split('/');
-                        const deviceId = pathParts[1]; // tokenUsage/{deviceId}/entries/{entryId}
-                        
-                        allUsage.push({
-                            id: entryDoc.id,
-                            deviceId: deviceId || data.deviceId,
-                            ...data
-                        });
-                    });
-                } catch (collectionGroupError) {
-                    console.warn('Collection group query failed, using fallback:', collectionGroupError);
-                    // Fallback: query tokenUsage collection and iterate through subcollections
-                    const tokenUsageRef = window.db.collection('tokenUsage');
-                    const deviceIdsSnapshot = await tokenUsageRef.get();
-                    
-                    for (const deviceDoc of deviceIdsSnapshot.docs) {
-                        const entriesSnapshot = await deviceDoc.ref.collection('entries').get();
-                        entriesSnapshot.docs.forEach(entryDoc => {
-                            allUsage.push({
-                                id: entryDoc.id,
-                                deviceId: deviceDoc.id,
-                                ...entryDoc.data()
-                            });
-                        });
-                    }
-                }
-                
-                // Sort by createdAt descending (latest first)
-                allUsage.sort((a, b) => {
-                    const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-                    const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-                    return bTime - aTime; // Latest first
-                });
-                
-                displayUsage();
-            } catch (error) {
-                console.error('Error loading usage:', error);
-                if (error.code === 'permission-denied') {
-                    alert('Permission denied. Please update Firestore security rules.\n\nSee FIRESTORE_RULES_UPDATE.md for instructions.');
-                } else {
-                    alert('Error loading usage: ' + error.message);
-                }
-                document.getElementById('usageTableBody').innerHTML = 
-                    '<tr><td colspan="9" class="loading" style="color: #e74c3c;">Error: ' + error.message + '</td></tr>';
             }
         }
 
@@ -1139,9 +1081,6 @@
                 
                 editingRow = null;
                 originalData = {};
-                await loadUsers();
-                await loadUsage();
-                calculateStats();
                 alert('Data updated successfully!');
             } catch (error) {
                 console.error('Error updating:', error);
@@ -1315,16 +1254,6 @@
             });
         }
 
-        // Refresh data every 30 seconds
-        setInterval(async () => {
-            if (WWJDAdminAuth.currentUser && WWJDAdminAuth.isAdminUser(WWJDAdminAuth.currentUser)) {
-                await loadUsers();
-                await loadUsage();
-                await loadContacts();
-                await loadAppLogs();
-                calculateStats();
-            }
-        }, 30000);
     </script>
 </body>
 </html>

@@ -447,13 +447,17 @@
 
     <script>
         async function logout() {
+            stopContactsListener();
             await WWJDAdminAuth.logout();
         }
 
         WWJDAdminAuth.wireLoginForm();
         WWJDAdminAuth.initializeFirebase({
             onAuthenticated: async function () {
-                await loadContacts();
+                startContactsListener();
+            },
+            onLoggedOut: function () {
+                stopContactsListener();
             }
         }).catch(function (error) {
             console.error('Firebase init error:', error);
@@ -462,27 +466,38 @@
 
         let currentContactId = null;
         let messagesUnsubscribe = null;
+        let contactsUnsubscribe = null;
 
         // Contacts Management
         let allContacts = [];
 
-        async function loadContacts() {
-            try {
-                const snapshot = await window.db.collection('contacts')
-                    .orderBy('lastMessageAt', 'desc')
-                    .get();
-                
-                allContacts = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                displayContacts();
-            } catch (error) {
-                console.error('Error loading contacts:', error);
-                document.getElementById('contactsList').innerHTML = 
-                    '<div class="loading" style="color: #e74c3c;">Error loading contacts: ' + error.message + '</div>';
+        function stopContactsListener() {
+            if (contactsUnsubscribe) {
+                contactsUnsubscribe();
+                contactsUnsubscribe = null;
             }
+        }
+
+        function startContactsListener() {
+            stopContactsListener();
+            if (!window.db) return;
+
+            contactsUnsubscribe = window.db.collection('contacts')
+                .orderBy('lastMessageAt', 'desc')
+                .onSnapshot(function (snapshot) {
+                    allContacts = snapshot.docs.map(function (doc) {
+                        return Object.assign({ id: doc.id }, doc.data());
+                    });
+                    displayContacts();
+                }, function (error) {
+                    console.error('Error loading contacts:', error);
+                    document.getElementById('contactsList').innerHTML =
+                        '<div class="loading" style="color: #e74c3c;">Error loading contacts: ' + error.message + '</div>';
+                });
+        }
+
+        async function loadContacts() {
+            startContactsListener();
         }
 
         function displayContacts() {
@@ -745,12 +760,6 @@
             return div.innerHTML;
         }
 
-        // Auto-refresh contacts every 30 seconds
-        setInterval(async () => {
-            if (WWJDAdminAuth.currentUser && WWJDAdminAuth.isAdminUser(WWJDAdminAuth.currentUser)) {
-                await loadContacts();
-            }
-        }, 30000);
     </script>
 </body>
 </html>
