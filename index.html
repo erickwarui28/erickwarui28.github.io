@@ -35,23 +35,30 @@
             font-size: 18px;
         }
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            align-items: stretch;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 40px 20px;
+            box-sizing: border-box;
         }
         .card {
             background-color: #333; /* Dark card background */
             border-radius: 15px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Soft but deep shadow */
-            margin: 20px;
-            padding: 30px;
-            width: 320px;
+            padding: 22px 18px;
+            width: auto;
+            min-width: 0;
             text-align: center;
+            display: flex;
+            flex-direction: column;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
         }
         .card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7); /* Enhanced shadow on hover */
         }
         .card.featured {
@@ -75,27 +82,21 @@
             left: 100%;
         }
         .card.featured:hover {
-            transform: translateY(-15px) scale(1.02);
+            transform: translateY(-10px);
             box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4), 0 0 40px rgba(212, 175, 55, 0.2);
         }
         .card.featured h3 {
             color: #d4af37;
-            font-size: 24px;
+            font-size: clamp(1.05rem, 1.1vw + 0.7rem, 1.35rem);
             font-weight: bold;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-            margin-bottom: 20px;
-        }
-        .card.featured p {
-            color: #e0e0e0;
-            font-size: 16px;
-            line-height: 1.8;
-            margin-bottom: 25px;
+            margin-bottom: 12px;
         }
         .card.featured a {
             background: linear-gradient(135deg, #d4af37, #b7952b);
             color: #1e1e1e;
             font-weight: bold;
-            padding: 15px 35px;
+            padding: 12px 20px;
             border-radius: 30px;
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
             transition: all 0.3s ease;
@@ -119,28 +120,83 @@
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
         }
         .card h3 {
-            margin-bottom: 15px;
+            margin: 0 0 12px;
             color: #d4af37; /* Gold-like color for headings */
+            font-size: clamp(1rem, 0.9vw + 0.7rem, 1.25rem);
+            line-height: 1.3;
         }
-        .card p {
+        .card > p:not(.stack) {
             color: #ccc; /* Light gray for the description */
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin: 0 0 14px;
+            line-height: 1.55;
+            font-size: clamp(0.85rem, 0.35vw + 0.75rem, 0.95rem);
+            flex: 1;
         }
         .card a {
             display: inline-block;
-            margin-top: 15px;
-            padding: 12px 30px;
+            margin-top: auto;
+            padding: 10px 18px;
             background-color: #d4af37; /* Gold-like button */
             color: #1e1e1e; /* Dark text on the button */
             text-decoration: none;
             border-radius: 25px;
+            font-size: 0.9rem;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); /* Gold shadow */
+            max-width: 100%;
+            box-sizing: border-box;
         }
         .card a:hover {
             background-color: #b7952b; /* Darker gold on hover */
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+        .card .actions {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            margin-top: auto;
+            width: 100%;
+        }
+        .card .actions a {
+            margin-top: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .card .stack {
+            margin: 0 0 14px;
+            font-size: clamp(0.7rem, 0.2vw + 0.65rem, 0.78rem);
+            line-height: 1.45;
+            color: #9a9a9a;
+            letter-spacing: 0.02em;
+        }
+        .card .stack strong {
+            color: #d4af37;
+            font-weight: 600;
+        }
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+            }
+        }
+        @media (max-width: 640px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 28px 16px;
+                gap: 16px;
+            }
+            .card {
+                padding: 24px 20px;
+            }
+            .card a,
+            .card .actions a {
+                width: auto;
+                align-self: center;
+            }
+            .card .actions {
+                align-items: center;
+            }
         }
         .links {
             display: flex;
@@ -195,12 +251,32 @@
             <div class="featured-badge">Featured</div>
             <h3>ES-AI CRM WorkSuite</h3>
             <p>AI-powered HR, CRM, and project management. Run clients, projects, tickets, and your team from one workspace.</p>
+            <p class="stack"><strong>Stack:</strong> Laravel (PHP 8.1+), Bootstrap 4, Laravel Mix</p>
             <a href="op-crm/">Open OP CRM</a>
+        </div>
+        <div class="card">
+            <h3>OverPowered To-Do</h3>
+            <p>A Firebase-backed todo app for daily planning, weekly tracking, notes, and projects—with secure Google sign-in and optional 2FA.</p>
+            <p class="stack"><strong>Stack:</strong> React, TypeScript, Vite, Firebase, Capacitor</p>
+            <a href="es-todo/">Open App</a>
+        </div>
+        <div class="card">
+            <h3>PesaDiary</h3>
+            <p>Turn M-Pesa SMS messages into private, on-device financial insights—balances, spending summaries, and transaction breakdowns without sending your data to a server.</p>
+            <p class="stack"><strong>Stack:</strong> Kotlin, Jetpack Compose, Android</p>
+            <div class="actions">
+                <a href="PesaDiary/">Learn More</a>
+                <a href="https://play.google.com/store/apps/details?id=com.pesainsights.app" target="_blank" rel="noopener noreferrer">📱 Download on Google Play</a>
+            </div>
         </div>
         <div class="card">
             <h3>WWJD - What Would Jesus Do?</h3>
             <p>Seeking spiritual guidance in your daily life? WWJD Reflections helps you explore biblical wisdom and find answers to life's questions through faith-based perspectives.</p>
-            <a href="https://play.google.com/store/apps/details?id=com.wwjdai.app" target="_blank" rel="noopener noreferrer">📱 Download on Google Play</a>
+            <p class="stack"><strong>Stack:</strong> React Native (Expo), TypeScript, Firebase, Gemini API</p>
+            <div class="actions">
+                <a href="wwjd/">Learn More</a>
+                <a href="https://play.google.com/store/apps/details?id=com.wwjdai.app" target="_blank" rel="noopener noreferrer">📱 Download on Google Play</a>
+            </div>
         </div>
     </div>
     <div class="links">
