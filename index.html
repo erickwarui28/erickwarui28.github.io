@@ -264,6 +264,102 @@
         footer .freelance a:hover {
             color: var(--gold);
         }
+        .contact-section {
+            max-width: 720px;
+            margin: 0 auto 12px;
+            padding: 0 20px 28px;
+        }
+        .contact-card {
+            background: var(--card);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            padding: 28px 24px;
+        }
+        .contact-card h2 {
+            margin: 0 0 8px;
+            color: var(--gold);
+            font-size: 1.35rem;
+            text-align: center;
+        }
+        .contact-card .lede {
+            text-align: center;
+            color: var(--muted);
+            margin: 0 0 22px;
+            font-size: 0.95rem;
+        }
+        .contact-card label {
+            display: block;
+            margin: 0 0 6px;
+            color: var(--gold);
+            font-size: 0.82rem;
+            letter-spacing: 0.04em;
+        }
+        .contact-card input,
+        .contact-card textarea {
+            width: 100%;
+            margin: 0 0 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            background: #2c2c2c;
+            color: var(--text);
+            font: inherit;
+        }
+        .contact-card textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+        .contact-card input:focus,
+        .contact-card textarea:focus {
+            outline: 2px solid var(--gold);
+        }
+        .hp {
+            position: absolute;
+            left: -10000px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        .contact-card button {
+            display: inline-block;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #1e1e1e;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .contact-card button:disabled {
+            opacity: 0.65;
+            cursor: wait;
+        }
+        .contact-actions {
+            text-align: center;
+        }
+        #contactStatus {
+            min-height: 1.4em;
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: 0.92rem;
+        }
+        #contactStatus[data-kind="ok"] { color: #8fce7a; }
+        #contactStatus[data-kind="error"] { color: #e07070; }
+        .admin-glint {
+            color: #202020;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 0;
+            opacity: 0.28;
+        }
+        .admin-glint:hover,
+        .admin-glint:focus {
+            color: #262626;
+            text-decoration: none;
+            opacity: 0.45;
+        }
         @media (max-width: 1100px) {
             .container {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -295,6 +391,7 @@
             <a href="https://github.com/erickwarui28" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://www.linkedin.com/in/erick-warui-328947100/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href="mailto:erickwarui28@gmail.com">Email</a>
+            <a href="#contact">Contact</a>
             <a class="primary" href="Erick_Warui_CV.pdf" download>Download CV</a>
         </nav>
     </header>
@@ -343,6 +440,33 @@
             </div>
         </article>
     </main>
+
+    <p class="section-label" id="contact">Contact</p>
+    <section class="contact-section" aria-labelledby="contact-heading">
+        <div class="contact-card">
+            <h2 id="contact-heading">Work with me</h2>
+            <p class="lede">Tell me about the role or project. I will reply to the email you provide.</p>
+            <form id="contactForm" method="post" action="#" novalidate>
+                <label for="contactName">Name</label>
+                <input id="contactName" name="name" type="text" maxlength="80" required autocomplete="name">
+                <label for="contactEmail">Email</label>
+                <input id="contactEmail" name="email" type="email" maxlength="254" required autocomplete="email">
+                <label for="contactCompany">Company (optional)</label>
+                <input id="contactCompany" name="company" type="text" maxlength="120" autocomplete="organization">
+                <div class="hp" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+                </div>
+                <label for="contactMessage">Message</label>
+                <textarea id="contactMessage" name="message" maxlength="4000" required></textarea>
+                <div class="contact-actions">
+                    <button id="contactSubmit" type="submit">Send message</button>
+                </div>
+                <p id="contactStatus" role="status"></p>
+            </form>
+        </div>
+    </section>
+
     <footer>
         <a href="https://github.com/erickwarui28">github.com/erickwarui28</a>
         &nbsp;·&nbsp;
@@ -353,7 +477,9 @@
             <a href="https://www.upwork.com/services/product/development-it-great-system-developed-in-php-laravel-or-ci-1847949839278728481?ref=project_share" target="_blank" rel="noopener noreferrer">Upwork</a>,
             and
             <a href="https://kwork.com/web-development/34015101/develop-php-laravel-or-codeigniter-systems" target="_blank" rel="noopener noreferrer">Kwork</a>
+            <a class="admin-glint" href="admin.html" rel="nofollow">.</a>
         </p>
     </footer>
+    <script type="module" src="js/contact-form.js"></script>
 </body>
 </html>

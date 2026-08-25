@@ -1,1 +1,9 @@
 Erick_Warui_CV.docx
+.firestore-rules-analysis.md
+.firebase/
+
+# Firebase CLI / deploy-only — not needed on GitHub Pages
+firestore.rules
+firestore.indexes.json
+firebase.json
+.firebaserc

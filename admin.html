@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Inbox</title>
+    <link rel="shortcut icon" type="image/png" href="ES_Logo-removebg-preview.png" />
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --card: #333;
+            --gold: #d4af37;
+            --gold-dark: #b7952b;
+            --text: #e0e0e0;
+            --muted: #9a9a9a;
+            --danger: #c45c5c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+        h1 {
+            color: var(--gold);
+            margin: 0 0 8px;
+            font-size: 1.6rem;
+        }
+        .sub {
+            color: var(--muted);
+            margin: 0 0 28px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 28px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+        label {
+            display: block;
+            margin: 0 0 6px;
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            background: #2c2c2c;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: 2px solid var(--gold);
+        }
+        button {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #1e1e1e;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 22px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button.ghost {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+        button.danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        .error {
+            color: #e07070;
+            min-height: 1.2em;
+            margin: 0 0 12px;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        #contactList {
+            display: grid;
+            gap: 16px;
+        }
+        .message-card {
+            background: #2c2c2c;
+            border-radius: 12px;
+            padding: 18px;
+            border-left: 4px solid var(--gold);
+        }
+        .message-card.status-read { border-left-color: #6e6e6e; }
+        .message-card.status-archived { border-left-color: #4a4a4a; opacity: 0.8; }
+        .msg-name { margin: 0 0 4px; color: var(--gold); }
+        .msg-email, .msg-company, .msg-when {
+            margin: 0 0 6px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .msg-body {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 12px 0;
+            line-height: 1.55;
+        }
+        .msg-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .msg-actions button {
+            padding: 8px 14px;
+            font-size: 0.85rem;
+        }
+        #emptyState { color: var(--muted); }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <section id="loginView" class="card">
+            <h1>Sign in</h1>
+            <p class="sub">Authorized inbox access only.</p>
+            <form id="loginForm" autocomplete="username">
+                <label for="adminEmail">Email</label>
+                <input id="adminEmail" name="email" type="email" autocomplete="username" required maxlength="254">
+                <label for="adminPassword">Password</label>
+                <input id="adminPassword" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128">
+                <p id="loginError" class="error" role="alert"></p>
+                <button type="submit">Sign in</button>
+            </form>
+        </section>
+
+        <section id="inboxView" hidden>
+            <div class="toolbar">
+                <div>
+                    <h1>Contact inbox</h1>
+                    <p id="inboxMeta" class="sub">Loading…</p>
+                </div>
+                <button id="logoutBtn" class="ghost" type="button">Sign out</button>
+            </div>
+            <p id="emptyState" hidden>No messages yet.</p>
+            <div id="contactList"></div>
+        </section>
+    </div>
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
