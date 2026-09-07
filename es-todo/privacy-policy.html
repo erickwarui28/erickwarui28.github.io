@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Privacy Policy for OverPowered To-Do App — how we handle account, task, note, and reminder data.">
+  <meta name="description" content="Privacy Policy for OverPowered To-Do App — account, tasks, notes, Pro subscriptions, and Google Play Billing.">
   <title>Privacy Policy — OverPowered To-Do App</title>
   <style>
     :root {
@@ -158,13 +158,13 @@
         <strong>Package:</strong> com.overpoweredtodo.app<br>
         <strong>Web app:</strong> <a href="https://erickwarui28.github.io/es-todo/">erickwarui28.github.io/es-todo</a><br>
         <strong>Effective date:</strong> August 26, 2026<br>
-        <strong>Last updated:</strong> August 26, 2026
+        <strong>Last updated:</strong> September 7, 2026
       </p>
     </header>
 
     <main>
       <div class="summary" role="note" aria-label="Summary">
-        <p><strong>In short:</strong> OverPowered To-Do App stores your account, tasks, notes, projects, and optional images in Firebase so you can sync across web and Android. Data is scoped to your signed-in account. We do not sell your data or use it for advertising.</p>
+        <p><strong>In short:</strong> OverPowered To-Do App stores your account, tasks, notes, projects, and optional images in Firebase so you can sync across web and Android. Optional <strong>OP To-Do Pro</strong> subscriptions are sold through <strong>Google Play Billing</strong>; we store plan/entitlement status on your account (shared on web and Android). We do not sell your data or use it for advertising. Payments and refunds are handled by Google Play.</p>
       </div>
 
       <p>
@@ -190,6 +190,9 @@
       <p>
         OverPowered To-Do App helps you plan daily tasks, track weekly completions, organize projects/categories, save notes, attach optional images, and set local reminder notifications. You can sign in with Google, email/password, or username, and optionally enable Google Authenticator–style 2FA.
       </p>
+      <p>
+        The App offers a free tier and an optional paid upgrade called <strong>OP To-Do Pro</strong> (for example Summaries, extra project limits, images, recurrence, export, and related Pro features). Pro is purchased on Android through Google Play; the same Free/Pro entitlement applies when you sign in on the web.
+      </p>
 
       <h2>3. Information we collect</h2>
       <p>Depending on how you use the App, we may process:</p>
@@ -197,8 +200,9 @@
         <li><strong>Account information</strong> — email address, username, display name, authentication identifiers, and (if you choose Google Sign-In) basic Google profile details provided by Google for sign-in</li>
         <li><strong>Security data</strong> — password authentication credentials managed by Firebase Authentication; optional Time-based One-Time Password (TOTP) / authenticator settings you enable</li>
         <li><strong>App content you create</strong> — tasks, due dates, completion status, notes, project/category names, reminder times, soft-delete/trash metadata, and optional images you attach</li>
+        <li><strong>Subscription and entitlement data</strong> — Free/Pro plan status, trial or subscription expiry times, product identifiers (such as monthly or yearly), plan source (for example Google Play / RevenueCat, in-app trial, or admin grant), and related timestamps used to unlock Pro features on web and Android. We do <strong>not</strong> receive or store your full payment card number; Google Play processes payments.</li>
         <li><strong>Device permissions (Android)</strong> — camera and/or photo library access only when you choose to attach an image; notification permission when you enable reminders</li>
-        <li><strong>Technical/operational data</strong> — standard Firebase/Google service logs needed to authenticate, sync, and operate the App (for example, authentication events)</li>
+        <li><strong>Technical/operational data</strong> — standard Firebase/Google service logs needed to authenticate, sync, and operate the App (for example, authentication events); purchase and entitlement events processed via Google Play and RevenueCat as needed to validate subscriptions</li>
       </ul>
       <p>
         We do <strong>not</strong> sell personal information and do <strong>not</strong> use your task/note content for advertising or third-party marketing.
@@ -211,13 +215,29 @@
         <li>Store and sync your tasks, notes, projects, and images across your signed-in sessions</li>
         <li>Schedule and show local reminder notifications you configure</li>
         <li>Provide account features such as Trash (soft delete), restore, and permanent delete</li>
+        <li>Determine and sync Free vs Pro access (including trials and grace periods) across web and Android</li>
+        <li>Process and validate OP To-Do Pro purchases, restores, renewals, and cancellations through Google Play Billing and RevenueCat</li>
         <li>Operate admin/support features that are limited to authorized administrators of the App</li>
         <li>Maintain security, prevent abuse, and improve reliability of the service</li>
       </ul>
 
-      <h2>5. Where your data is stored</h2>
+      <h2>5. Payments, subscriptions, and refunds</h2>
       <p>
-        Account and app content are stored using <strong>Google Firebase</strong> services (including Firebase Authentication and Cloud Firestore). Optional task/note images are compressed and stored with your documents (as data URLs) rather than in a separate public media CDN.
+        Optional <strong>OP To-Do Pro</strong> subscriptions (for example monthly or yearly plans, which may include a free trial offer configured in Google Play) are sold on Android using <strong>Google Play Billing</strong>. Google collects and processes payment information under Google’s terms and privacy policy. We receive subscription status and related entitlement information so we can unlock Pro features on your account.
+      </p>
+      <p>
+        We use <strong>RevenueCat</strong> to help manage in-app purchases and entitlements with Google Play. RevenueCat may process identifiers such as your app user id (typically your Firebase Auth user id) and purchase/entitlement metadata according to RevenueCat’s privacy policy.
+      </p>
+      <p>
+        <strong>Refunds, cancellations, and billing disputes</strong> for Play purchases are handled by <strong>Google Play</strong> under Google’s policies. You can manage or cancel subscriptions in your Google Play account subscription settings. Soft trials or admin grants that do not go through Google Play are not Google Play charges.
+      </p>
+      <p>
+        The website does not process card payments for Pro. Web reads the same plan status stored on your account after an Android purchase (or after an eligible trial/admin grant).
+      </p>
+
+      <h2>6. Where your data is stored</h2>
+      <p>
+        Account and app content are stored using <strong>Google Firebase</strong> services (including Firebase Authentication and Cloud Firestore). Optional task/note images are compressed and stored with your documents (as data URLs) rather than in a separate public media CDN. Plan/entitlement fields used for Pro access are stored with your Firebase user profile.
       </p>
       <p>
         On Android, reminder notifications are scheduled locally on your device. Camera/gallery access is used only to pick or capture images you choose to attach.
@@ -226,62 +246,64 @@
         Access to user content in Firestore is restricted by security rules so that, under normal operation, each signed-in user can only read and write their own data (except for limited admin tooling for authorized administrators).
       </p>
 
-      <h2>6. Third-party services</h2>
+      <h2>7. Third-party services</h2>
       <p>The App relies on these providers to function:</p>
       <ul>
         <li><strong>Google Firebase / Google Cloud</strong> — authentication and cloud database hosting</li>
         <li><strong>Google Sign-In</strong> — optional sign-in method</li>
-        <li><strong>Google Play</strong> — Android distribution and related Play services</li>
+        <li><strong>Google Play</strong> — Android distribution, Google Play Billing for OP To-Do Pro, and related Play services</li>
+        <li><strong>RevenueCat</strong> — subscription and entitlement management for Google Play purchases</li>
         <li><strong>GitHub Pages</strong> — hosting of the web app and this privacy policy page</li>
       </ul>
       <p>
         Those providers process data according to their own privacy policies. We configure Firebase so your app content is associated with your account and not shared publicly by us.
       </p>
 
-      <h2>7. Data sharing and disclosure</h2>
+      <h2>8. Data sharing and disclosure</h2>
       <p>
         We do <strong>not</strong> sell, rent, or trade your personal information.
       </p>
       <p>
-        We share data only with the infrastructure providers listed above as needed to run the App, or if required by law, regulation, legal process, or governmental request, or to protect our rights, users, or the public where permitted by law.
+        We share data only with the infrastructure and billing providers listed above as needed to run the App and validate subscriptions, or if required by law, regulation, legal process, or governmental request, or to protect our rights, users, or the public where permitted by law.
       </p>
 
-      <h2>8. Retention and deletion</h2>
+      <h2>9. Retention and deletion</h2>
       <ul>
-        <li><strong>While your account is active:</strong> we retain account and content data needed to provide the App.</li>
+        <li><strong>While your account is active:</strong> we retain account, content, and entitlement data needed to provide the App and honor an active Pro subscription or trial.</li>
         <li><strong>Trash:</strong> items you soft-delete remain until you restore them or permanently delete them (or clear trash).</li>
-        <li><strong>Account deletion / content deletion:</strong> you may permanently delete individual items in the App. To request full account deletion or help removing remaining data, email <a href="mailto:erickwarui28@gmail.com">erickwarui28@gmail.com</a>.</li>
-        <li><strong>Uninstalling the Android app</strong> removes the local app and local notification schedules from that device, but does not by itself delete your cloud account data.</li>
+        <li><strong>Account deletion / content deletion:</strong> you may permanently delete individual items in the App. To request full account deletion or help removing remaining data, email <a href="mailto:erickwarui28@gmail.com">erickwarui28@gmail.com</a>. Canceling a Google Play subscription through Google does not by itself delete your OP To-Do account.</li>
+        <li><strong>Uninstalling the Android app</strong> removes the local app and local notification schedules from that device, but does not by itself delete your cloud account data or cancel a Play subscription.</li>
       </ul>
 
-      <h2>9. Your choices and rights</h2>
+      <h2>10. Your choices and rights</h2>
       <p>You can:</p>
       <ul>
         <li>Update or delete tasks, notes, projects, and images inside the App</li>
         <li>Enable or disable notifications and revoke camera/photos permission in Android settings</li>
         <li>Enable, disable, or change authenticator 2FA from Account settings</li>
+        <li>Manage, restore, or cancel Pro subscriptions through Google Play (Android) and the in-app Account / Restore purchases controls</li>
         <li>Sign out, stop using the App, or request account/data deletion by contacting us</li>
       </ul>
       <p>
         Depending on your location (including the EEA, UK, Kenya, and other regions with data protection laws), you may have rights to access, correct, delete, restrict, or object to certain processing, or to data portability. Contact us to exercise these rights.
       </p>
 
-      <h2>10. Children's privacy</h2>
+      <h2>11. Children's privacy</h2>
       <p>
         The App is not directed to children under 13 (or the minimum age required in your country). We do not knowingly collect personal information from children. If you believe a child has created an account or provided information, contact us and we will help address it.
       </p>
 
-      <h2>11. Security</h2>
+      <h2>12. Security</h2>
       <p>
-        We use industry-standard providers (Firebase Authentication and Firestore rules) and optional 2FA to help protect accounts. No method of electronic storage or transmission is 100% secure. Please use a strong password, protect your devices, and keep 2FA enabled when available.
+        We use industry-standard providers (Firebase Authentication and Firestore rules) and optional 2FA to help protect accounts. Payment card data for Play purchases is handled by Google Play, not by our servers. No method of electronic storage or transmission is 100% secure. Please use a strong password, protect your devices, and keep 2FA enabled when available.
       </p>
 
-      <h2>12. International users</h2>
+      <h2>13. International users</h2>
       <p>
-        Firebase/Google may process and store data in data centers outside your country. By using the App, you understand that your information may be transferred to and processed in countries where Google operates, subject to applicable safeguards and provider terms.
+        Firebase/Google and RevenueCat may process and store data in data centers outside your country. By using the App, you understand that your information may be transferred to and processed in countries where those providers operate, subject to applicable safeguards and provider terms.
       </p>
 
-      <h2>13. Data collection summary (Google Play)</h2>
+      <h2>14. Data collection summary (Google Play)</h2>
       <table>
         <thead>
           <tr>
@@ -311,6 +333,18 @@
             <td>User-provided attachments</td>
           </tr>
           <tr>
+            <td>Purchase / subscription / entitlement status</td>
+            <td>Yes (if you subscribe or start a trial)</td>
+            <td>Yes — Google Play Billing; RevenueCat for entitlement sync; Firebase for plan fields on your profile</td>
+            <td>Sell and fulfill OP To-Do Pro; sync Free/Pro across devices</td>
+          </tr>
+          <tr>
+            <td>Payment card numbers</td>
+            <td>No (not received by us)</td>
+            <td>Processed by Google Play only</td>
+            <td>Google handles checkout for Play subscriptions</td>
+          </tr>
+          <tr>
             <td>Local notifications</td>
             <td>On device</td>
             <td>No</td>
@@ -331,19 +365,19 @@
         </tbody>
       </table>
 
-      <h2>14. Changes to this policy</h2>
+      <h2>15. Changes to this policy</h2>
       <p>
         We may update this Privacy Policy from time to time. When we do, we will revise the "Last updated" date at the top of this page. If changes are material, we may also notify you through the App or Google Play listing. Continued use of the App after an update means you accept the revised policy.
       </p>
 
-      <h2>15. Contact us</h2>
+      <h2>16. Contact us</h2>
       <p>
         If you have questions about this Privacy Policy or our privacy practices, contact:
       </p>
       <p>
         Erick Warui<br>
         Email: <a href="mailto:erickwarui28@gmail.com">erickwarui28@gmail.com</a><br>
-        Privacy policy URL (after you publish this file):
+        Privacy policy URL:
         <a href="https://erickwarui28.github.io/es-todo/privacy-policy.html">https://erickwarui28.github.io/es-todo/privacy-policy.html</a>
       </p>
     </main>
