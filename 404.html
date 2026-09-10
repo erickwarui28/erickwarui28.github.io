@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      (function () {
+        var path = location.pathname + location.search + location.hash;
+        var prefixes = ['/op-ma'];
+        for (var i = 0; i < prefixes.length; i++) {
+          var base = prefixes[i];
+          if (path === base || path.indexOf(base + '/') === 0) {
+            try {
+              sessionStorage.setItem('opma-spa-path', path);
+            } catch (e) {}
+            location.replace(base + '/' + location.search + location.hash);
+            return;
+          }
+        }
+        location.replace('/');
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting…</p>
+  </body>
+</html>
