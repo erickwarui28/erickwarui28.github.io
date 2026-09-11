@@ -161,7 +161,8 @@
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
             margin-bottom: 12px;
         }
-        .card.featured a.btn {
+        .card.featured a.btn,
+        .card.featured button.btn {
             background: linear-gradient(135deg, var(--gold), var(--gold-dark));
             color: #1e1e1e;
             font-weight: bold;
@@ -169,7 +170,8 @@
             border-radius: 30px;
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
         }
-        .card.featured a.btn:hover {
+        .card.featured a.btn:hover,
+        .card.featured button.btn:hover {
             background: linear-gradient(135deg, var(--gold-dark), var(--gold));
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
@@ -201,20 +203,25 @@
             font-size: clamp(0.85rem, 0.35vw + 0.75rem, 0.95rem);
             flex: 1;
         }
-        .card a.btn {
+        .card a.btn,
+        .card button.btn {
             display: inline-block;
             margin-top: auto;
             padding: 10px 18px;
             background-color: var(--gold);
             color: #1e1e1e;
             text-decoration: none;
+            border: none;
             border-radius: 25px;
+            font: inherit;
             font-size: 0.9rem;
+            cursor: pointer;
             transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
             max-width: 100%;
         }
-        .card a.btn:hover {
+        .card a.btn:hover,
+        .card button.btn:hover {
             background-color: var(--gold-dark);
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
         }
@@ -226,7 +233,8 @@
             margin-top: auto;
             width: 100%;
         }
-        .card .actions a.btn {
+        .card .actions a.btn,
+        .card .actions button.btn {
             margin-top: 0;
             width: 100%;
         }
@@ -374,12 +382,94 @@
             }
             .card { padding: 24px 20px; }
             .card a.btn,
-            .card .actions a.btn {
+            .card button.btn,
+            .card .actions a.btn,
+            .card .actions button.btn {
                 width: auto;
                 align-self: center;
             }
             .card .actions { align-items: center; }
         }
+        .demo-modal[hidden] { display: none; }
+        .demo-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .demo-modal__backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.78);
+        }
+        .demo-modal__dialog {
+            position: relative;
+            z-index: 1;
+            width: min(360px, 100%);
+            max-height: 90vh;
+            background: #2a2a2a;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 16px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
+            padding: 16px 16px 18px;
+        }
+        .demo-modal__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .demo-modal__title {
+            margin: 0;
+            color: var(--gold);
+            font-size: 1.05rem;
+        }
+        .demo-modal__close {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 50%;
+            background: transparent;
+            color: var(--gold);
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .demo-modal__close:hover,
+        .demo-modal__close:focus-visible {
+            background: rgba(212, 175, 55, 0.15);
+            outline: none;
+        }
+        .demo-modal__frame {
+            position: relative;
+            width: min(100%, calc(80vh * 9 / 16));
+            aspect-ratio: 9 / 16;
+            max-height: 80vh;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+        }
+        .demo-modal__frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .demo-modal__fallback {
+            display: block;
+            margin-top: 12px;
+            text-align: center;
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+        .demo-modal__fallback:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -417,9 +507,13 @@
         </article>
         <article class="card">
             <h3>OverPowered To-Do</h3>
-            <p class="outcome">Designed a Firebase todo app with Google sign-in and optional 2FA for private daily and weekly planning.</p>
+            <p class="outcome">Designed a Firebase todo app with Google sign-in and optional 2FA for private daily and weekly planning—also on Google Play.</p>
             <p class="stack"><strong>Stack:</strong> React, TypeScript, Vite, Firebase, Capacitor</p>
-            <a class="btn" href="es-todo/">Open App</a>
+            <div class="actions">
+                <a class="btn" href="es-todo/">Open App</a>
+                <a class="btn" href="https://play.google.com/store/apps/details?id=com.overpoweredtodo.app" target="_blank" rel="noopener noreferrer">Download on Google Play</a>
+                <button type="button" class="btn" id="opTodoWatchDemo" aria-haspopup="dialog" aria-controls="opTodoDemoModal" aria-expanded="false">Watch demo</button>
+            </div>
         </article>
         <article class="card">
             <h3>PesaDiary</h3>
@@ -440,6 +534,20 @@
             </div>
         </article>
     </main>
+
+    <div class="demo-modal" id="opTodoDemoModal" hidden>
+        <div class="demo-modal__backdrop" data-demo-close tabindex="-1"></div>
+        <div class="demo-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="opTodoDemoTitle">
+            <div class="demo-modal__header">
+                <h2 class="demo-modal__title" id="opTodoDemoTitle">OP To-Do demo</h2>
+                <button type="button" class="demo-modal__close" data-demo-close aria-label="Close demo">&times;</button>
+            </div>
+            <div class="demo-modal__frame">
+                <iframe id="opTodoDemoFrame" title="OP To-Do demo video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <a class="demo-modal__fallback" href="https://www.youtube.com/shorts/QP5To75Q7bo" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+        </div>
+    </div>
 
     <p class="section-label" id="contact">Contact</p>
     <section class="contact-section" aria-labelledby="contact-heading">
@@ -481,5 +589,6 @@
         </p>
     </footer>
     <script type="module" src="js/contact-form.js"></script>
+    <script type="module" src="js/op-todo-demo-modal.js"></script>
 </body>
 </html>
