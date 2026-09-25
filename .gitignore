@@ -7,3 +7,4 @@ firestore.rules
 firestore.indexes.json
 firebase.json
 .firebaserc
+*.mdc
