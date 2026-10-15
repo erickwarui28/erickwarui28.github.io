@@ -8,3 +8,13 @@ firestore.indexes.json
 firebase.json
 .firebaserc
 *.mdc
+
+# Local tooling and private configuration are never served by Pages.
+node_modules/
+.venv/
+.cursor/
+.env
+.env.*
+*.pem
+*.key
+*.log

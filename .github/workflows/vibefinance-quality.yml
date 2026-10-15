@@ -1,0 +1,51 @@
+name: VibeFinance submission quality
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact 40-character commit SHA from Wild-Bugs-VibeFinance
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require an immutable source revision
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+        run: '[[ "$SOURCE_REF" =~ ^[0-9a-f]{40}$ ]]'
+      - uses: actions/checkout@v4
+        with:
+          repository: erickwarui28/Wild-Bugs-VibeFinance
+          ref: ${{ inputs.source_ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w shared
+      - run: npm run lint
+      - run: npm test
+      - run: npm test
+        env:
+          VF_ALL_FEATURES: '0'
+      - run: npm run build
+        env:
+          VITE_BASE: /vibefinance/
+      - run: node --test deploy/recovery.test.mjs deploy/retention.test.mjs
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vibefinance-browser-qa
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
