@@ -1,6 +1,9 @@
+import { startAnalytics } from './admin-analytics.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
   getAuth,
+  setPersistence,
+  browserLocalPersistence,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut
@@ -18,7 +21,10 @@ import {
 import { ADMIN_EMAIL, firebaseConfig } from './firebase-config.js';
 
 const app = initializeApp(firebaseConfig);
+// Keep this browser signed in across page reloads and browser restarts.
+// Firebase refreshes short-lived tokens; sign-out and account revocation still apply.
 const auth = getAuth(app);
+await setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(app);
 
 const loginView = document.getElementById('loginView');
@@ -31,6 +37,7 @@ const emptyState = document.getElementById('emptyState');
 const inboxMeta = document.getElementById('inboxMeta');
 
 let unsubscribeInbox = null;
+let stopAnalytics = () => {};
 
 function isAdminUser(user) {
   return !!(user && user.email && user.email.toLowerCase() === ADMIN_EMAIL);
@@ -199,9 +206,12 @@ if (logoutBtn) {
 onAuthStateChanged(auth, function (user) {
   if (isAdminUser(user)) {
     showInbox();
+    stopAnalytics();
+    stopAnalytics = startAnalytics(user);
     startInbox();
   } else {
     if (user) signOut(auth);
+    stopAnalytics();
     stopInbox();
     showLogin();
   }
