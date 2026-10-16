@@ -34,7 +34,9 @@
   });
   if (saved() !== 'no') start();
   let dismissed = false; try { dismissed = localStorage.getItem('es-notice-dismissed') === 'yes'; } catch {}
-  if (!dismissed && saved() !== 'no') document.body.append(banner);
+  // Temporarily hide the notice so it cannot cover homepage controls.
+  const showAnalyticsNotice = false;
+  if (showAnalyticsNotice && !dismissed && saved() !== 'no') document.body.append(banner);
   function target(el) { return el?.closest('[data-analytics],button,a,input,select,textarea,summary')?.getAttribute('data-analytics') || el?.closest('[id]')?.id || el?.tagName?.toLowerCase() || 'page'; }
   document.addEventListener('click', e => event('click',target(e.target)));
   document.addEventListener('change', e => event('change',target(e.target)));

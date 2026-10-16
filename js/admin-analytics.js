@@ -21,8 +21,12 @@ export function startAnalytics(user) {
   async function load(){
     if(stopped||busy)return;busy=true;refresh.disabled=true;status.textContent='Loading analytics…';
     try {
-      const token=await user.getIdToken();
-      const response=await fetch(`https://67.211.211.236/site-analytics/report.php?days=${range.value}`,{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+      async function request(forceRefresh = false) {
+        const token = await user.getIdToken(forceRefresh);
+        return fetch(`https://67.211.211.236/site-analytics/report.php?days=${range.value}`,{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+      }
+      let response = await request();
+      if (response.status === 401) response = await request(true);
       if(!response.ok)throw new Error(`Analytics request failed (${response.status}).`);
       const data=await response.json();if(stopped)return;content.replaceChildren();
       const cards=document.createElement('div');cards.style.cssText='display:flex;flex-wrap:wrap;gap:12px';
