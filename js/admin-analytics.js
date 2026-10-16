@@ -3,7 +3,7 @@ export function startAnalytics(user) {
   if (!host) return () => {};
   host.replaceChildren();
   const heading = document.createElement('h2'); heading.textContent = 'Visitor activity'; host.append(heading);
-  const note = document.createElement('p'); note.textContent = 'Tracked visitors on the base URL (excluding opt-outs and supported browser privacy signals). IP addresses may be shared or masked by VPNs. Active time is an estimate; closing a browser can lose the final update. Summaries include the entire range; detail lists show the latest 200 visits and 500 events. Times use your browser timezone.'; host.append(note);
+  const note = document.createElement('p'); note.textContent = 'Tracked visitors on the base URL (excluding opt-outs and supported browser privacy signals). IP addresses may be shared or masked by VPNs. Active time is an estimate; closing a browser can lose the final update. Summaries include the entire range; detail lists show the latest 200 visits and 500 events. All times and daily totals use East Africa Time (EAT, UTC+3).'; host.append(note);
   const range = document.createElement('select'); range.setAttribute('aria-label','Analytics date range');
   for (const days of [1,7,30,90]) { const o = document.createElement('option'); o.value = days; o.textContent = `Last ${days} day${days>1?'s':''}`; o.selected = days===7; range.append(o); }
   const refresh = document.createElement('button'); refresh.type='button';refresh.textContent='Refresh';
@@ -11,12 +11,17 @@ export function startAnalytics(user) {
   const content = document.createElement('div'); host.append(range,refresh,status,content);
   let stopped=false, busy=false, interactionPage=0;
   const interactionsPerPage = 25;
+  const eatDateTime = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Nairobi', year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  function formatEAT(value, unixSeconds = false) {
+    const date = new Date(unixSeconds ? Number(value) * 1000 : value);
+    return Number.isNaN(date.getTime()) ? '' : eatDateTime.format(date) + ' EAT';
+  }
   function table(title,rows,keys, destination = content) {
     const h=document.createElement('h3');h.textContent=title;destination.append(h);
     const wrap=document.createElement('div');wrap.style.overflowX='auto';
     const t=document.createElement('table');t.style.cssText='width:100%;border-collapse:collapse;text-align:left;font-size:14px';
-    const head=t.createTHead().insertRow();for(const k of keys){const th=document.createElement('th');th.textContent=k.replaceAll('_',' ');th.style.padding='8px';head.append(th);}
-    const body=t.createTBody();for(const row of rows){const tr=body.insertRow();for(const k of keys){const td=tr.insertCell();td.style.cssText='padding:8px;border-top:1px solid #666;max-width:260px;overflow-wrap:anywhere';td.textContent=['started','seen'].includes(k)?new Date(Number(row[k])*1000).toLocaleString():String(row[k]??'');}}
+    const head=t.createTHead().insertRow();for(const k of keys){const th=document.createElement('th');th.textContent=['started','seen','at'].includes(k) ? k + ' (EAT)' : k.replaceAll('_',' ');th.style.padding='8px';head.append(th);}
+    const body=t.createTBody();for(const row of rows){const tr=body.insertRow();for(const k of keys){const td=tr.insertCell();td.style.cssText='padding:8px;border-top:1px solid #666;max-width:260px;overflow-wrap:anywhere';td.textContent=['started','seen'].includes(k)?formatEAT(row[k],true):k==='at'?formatEAT(row[k]):String(row[k]??'');}}
     if(!rows.length){const p=document.createElement('p');p.textContent='No activity recorded in this range.';destination.append(p);}else{wrap.append(t);destination.append(wrap);}
   }
   function recentInteractions(events) {
@@ -55,11 +60,11 @@ export function startAnalytics(user) {
       const data=await response.json();if(stopped)return;content.replaceChildren();
       const cards=document.createElement('div');cards.style.cssText='display:flex;flex-wrap:wrap;gap:12px';
       for(const [key,value] of Object.entries(data.summary)){const card=document.createElement('div');card.style.cssText='background:#222;border-radius:10px;padding:16px;flex:1;min-width:140px';const number=document.createElement('strong');number.style.cssText='display:block;font-size:24px;color:#d4af37';number.textContent=value;card.append(number,document.createTextNode(key.replaceAll('_',' ')));cards.append(card);}content.append(cards);
-      table('Daily totals (UTC)',data.daily,['day','visits','visitors']);
+      table('Daily totals (EAT)',data.daily,['day','visits','visitors']);
       table('Interaction summary',data.types,['type','count']);
       table('Recent visits',data.visits,['id','ip','started','seen','active','referrer','screen','language']);
       recentInteractions(data.events);
-      status.textContent=`Updated ${new Date().toLocaleTimeString()} · refreshes every 30 seconds`;
+      status.textContent=`Updated ${formatEAT(new Date())} · refreshes every 30 seconds`;
     }catch(error){if(!stopped)status.textContent=error.message+' Check your connection or sign in again.';}
     finally{busy=false;refresh.disabled=false;}
   }

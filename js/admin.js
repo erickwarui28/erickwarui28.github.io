@@ -60,7 +60,7 @@ function setLoginError(message) {
 
 function formatWhen(value) {
   if (!value || typeof value.toDate !== 'function') return 'Just now';
-  return value.toDate().toLocaleString();
+  return value.toDate().toLocaleString('en-GB', { timeZone: 'Africa/Nairobi', year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' EAT';
 }
 
 function textEl(tag, value, className) {
