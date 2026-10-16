@@ -9,14 +9,38 @@ export function startAnalytics(user) {
   const refresh = document.createElement('button'); refresh.type='button';refresh.textContent='Refresh';
   const status = document.createElement('p');status.setAttribute('role','status');
   const content = document.createElement('div'); host.append(range,refresh,status,content);
-  let stopped=false, busy=false;
-  function table(title,rows,keys) {
-    const h=document.createElement('h3');h.textContent=title;content.append(h);
+  let stopped=false, busy=false, interactionPage=0;
+  const interactionsPerPage = 25;
+  function table(title,rows,keys, destination = content) {
+    const h=document.createElement('h3');h.textContent=title;destination.append(h);
     const wrap=document.createElement('div');wrap.style.overflowX='auto';
     const t=document.createElement('table');t.style.cssText='width:100%;border-collapse:collapse;text-align:left;font-size:14px';
     const head=t.createTHead().insertRow();for(const k of keys){const th=document.createElement('th');th.textContent=k.replaceAll('_',' ');th.style.padding='8px';head.append(th);}
     const body=t.createTBody();for(const row of rows){const tr=body.insertRow();for(const k of keys){const td=tr.insertCell();td.style.cssText='padding:8px;border-top:1px solid #666;max-width:260px;overflow-wrap:anywhere';td.textContent=['started','seen'].includes(k)?new Date(Number(row[k])*1000).toLocaleString():String(row[k]??'');}}
-    if(!rows.length){const p=document.createElement('p');p.textContent='No activity recorded in this range.';content.append(p);}else{wrap.append(t);content.append(wrap);}
+    if(!rows.length){const p=document.createElement('p');p.textContent='No activity recorded in this range.';destination.append(p);}else{wrap.append(t);destination.append(wrap);}
+  }
+  function recentInteractions(events) {
+    const section = document.createElement('section');
+    section.setAttribute('aria-label', 'Recent interactions');
+    content.append(section);
+    function render() {
+      const pages = Math.max(1, Math.ceil(events.length / interactionsPerPage));
+      interactionPage = Math.min(interactionPage, pages - 1);
+      section.replaceChildren();
+      const start = interactionPage * interactionsPerPage;
+      table('Recent interactions', events.slice(start, start + interactionsPerPage), ['visit','type','target','value','at'], section);
+      const controls = document.createElement('nav');
+      controls.setAttribute('aria-label', 'Interaction pages');
+      controls.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:16px';
+      const previous = document.createElement('button'); previous.type = 'button'; previous.textContent = 'Previous'; previous.disabled = interactionPage === 0;
+      const next = document.createElement('button'); next.type = 'button'; next.textContent = 'Next'; next.disabled = interactionPage >= pages - 1;
+      const label = document.createElement('span'); label.setAttribute('role','status');
+      label.textContent = `Page ${interactionPage + 1} of ${pages} · ${events.length ? start + 1 : 0}–${Math.min(start + interactionsPerPage, events.length)} of ${events.length} recent interactions`;
+      previous.addEventListener('click', () => { interactionPage--; render(); });
+      next.addEventListener('click', () => { interactionPage++; render(); });
+      controls.append(previous,label,next); section.append(controls);
+    }
+    render();
   }
   async function load(){
     if(stopped||busy)return;busy=true;refresh.disabled=true;status.textContent='Loading analyticsâ€¦';
@@ -34,12 +58,12 @@ export function startAnalytics(user) {
       table('Daily totals (UTC)',data.daily,['day','visits','visitors']);
       table('Interaction summary',data.types,['type','count']);
       table('Recent visits',data.visits,['id','ip','started','seen','active','referrer','screen','language']);
-      table('Recent interactions',data.events,['visit','type','target','value','at']);
+      recentInteractions(data.events);
       status.textContent=`Updated ${new Date().toLocaleTimeString()} Â· refreshes every 30 seconds`;
     }catch(error){if(!stopped)status.textContent=error.message+' Check your connection or sign in again.';}
     finally{busy=false;refresh.disabled=false;}
   }
-  range.addEventListener('change',load);refresh.addEventListener('click',load);load();
+  range.addEventListener('change',() => { interactionPage=0; load(); });refresh.addEventListener('click',load);load();
   const interval=setInterval(load,30000);
   return ()=>{stopped=true;clearInterval(interval);host.replaceChildren();};
 }
