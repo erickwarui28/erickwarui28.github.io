@@ -35,7 +35,7 @@ export function startAnalytics(user) {
       const previous = document.createElement('button'); previous.type = 'button'; previous.textContent = 'Previous'; previous.disabled = interactionPage === 0;
       const next = document.createElement('button'); next.type = 'button'; next.textContent = 'Next'; next.disabled = interactionPage >= pages - 1;
       const label = document.createElement('span'); label.setAttribute('role','status');
-      label.textContent = `Page ${interactionPage + 1} of ${pages} · ${events.length ? start + 1 : 0}–${Math.min(start + interactionsPerPage, events.length)} of ${events.length} recent interactions`;
+      label.textContent = `Page ${interactionPage + 1} of ${pages} | ${events.length ? start + 1 : 0}-${Math.min(start + interactionsPerPage, events.length)} of ${events.length} recent interactions`;
       previous.addEventListener('click', () => { interactionPage--; render(); });
       next.addEventListener('click', () => { interactionPage++; render(); });
       controls.append(previous,label,next); section.append(controls);
