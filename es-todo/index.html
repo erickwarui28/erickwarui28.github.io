@@ -2,6 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (() => {
+        let preference = 'system';
+        try { preference = localStorage.getItem('es-todo-theme') || 'system'; } catch {}
+        const dark = preference === 'dark' || (preference !== 'light' && typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="./favicon-48.png" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -9,11 +18,11 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="viewport"
-      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0"
     />
     <title>OverPowered To-Do App</title>
-    <script type="module" crossorigin src="/es-todo/assets/index-kpiTfzvt.js"></script>
-    <link rel="stylesheet" crossorigin href="/es-todo/assets/index-gEiqWQhg.css">
+    <script type="module" crossorigin src="/es-todo/assets/index-CWHHUPmJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/es-todo/assets/index-sr_BD-mm.css">
   </head>
   <body>
     <div id="root"></div>
