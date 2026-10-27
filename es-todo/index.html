@@ -21,10 +21,19 @@
       content="viewport-fit=cover, width=device-width, initial-scale=1.0"
     />
     <title>OverPowered To-Do App</title>
-    <script type="module" crossorigin src="/es-todo/assets/index-FZ1YEI3r.js"></script>
-    <link rel="stylesheet" crossorigin href="/es-todo/assets/index-CSOJ4y2s.css">
+    <style>
+      .startup-screen{min-height:100vh;min-height:100dvh;display:grid;place-content:center;justify-items:center;gap:18px;margin:0;background:#f7f8fa;color:#17211b;font:16px system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+      [data-theme="dark"] .startup-screen{background:#0b0b0b;color:#f5f5f5}
+      .startup-screen p{margin:0}.startup-screen strong{font-size:22px}
+      .startup-spinner{width:28px;height:28px;border:3px solid #22c55e33;border-top-color:#22c55e;border-radius:50%;animation:startup-spin .9s linear infinite}
+      @keyframes startup-spin{to{transform:rotate(360deg)}}
+      @media(prefers-reduced-motion:reduce){.startup-spinner{animation:none}}
+      body{margin:0}
+    </style>
+    <script type="module" crossorigin src="/es-todo/assets/index-BfmA1jqG.js"></script>
+    <link rel="stylesheet" crossorigin href="/es-todo/assets/index-D-9eFZIP.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><main class="startup-screen" role="status" aria-live="polite"><img src="./icon-192.png" width="64" height="64" alt=""><strong>OverPowered To-Do App</strong><span class="startup-spinner" aria-hidden="true"></span><p>Opening your workspace…</p><noscript>Enable JavaScript to open the app.</noscript></main></div>
   </body>
 </html>
