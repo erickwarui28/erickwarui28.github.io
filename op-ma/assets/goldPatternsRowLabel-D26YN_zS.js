@@ -1,0 +1,1 @@
+import{bW as s,bX as g,bY as m}from"./index-C9qsdm_W.js";function d(e){if(!e.patternId)return"";const r=s(e.patternId),a=e.triggerTimeframe?` · ${e.triggerTimeframe} trigger`:"",t=(e.sampleStatus==="low_sample"&&e.sampleTriggers!=null?` · low sample (n=${e.sampleTriggers})`:"")||(e.triggerTimeframe==="5m"?g(m[e.patternId]):"");return`${r}${a}${t}`}export{d as g};

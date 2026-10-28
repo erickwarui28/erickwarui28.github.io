@@ -1,0 +1,1 @@
+import{r as s,bn as o}from"./index-C9qsdm_W.js";function u(e){const t=s.useRef(e);t.current=e,s.useEffect(()=>{function n(a){const r=a.detail;r&&t.current(r)}return window.addEventListener(o,n),()=>window.removeEventListener(o,n)},[])}export{u};
