@@ -13,5 +13,5 @@ window.WWJD_FIREBASE_CONFIG = {
   measurementId: 'G-QS4QK37S5S'
 };
 
-/** Only this Firebase Auth email may use the admin UI / adminSecrets. */
+/** Admin login hint; the VPS enforces the administrator UID. */
 window.WWJD_ADMIN_EMAIL = 'erickwarui28@gmail.com';
