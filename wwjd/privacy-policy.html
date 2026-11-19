@@ -156,7 +156,7 @@
     <div class="container">
         <h1>Privacy Policy</h1>
         <p class="subtitle">What Would Jesus Do (WWJD Reflections)</p>
-        <p class="last-updated"><strong>Last Updated:</strong> <span id="current-date"></span></p>
+        <p class="last-updated"><strong>Last Updated:</strong> November 19, 2026</p>
         
         <div class="highlight">
             <p><strong>Introduction</strong></p>
@@ -187,8 +187,8 @@
         <h3>1.1 Information You Provide</h3>
         <p>We collect information that you voluntarily provide when using our App:</p>
         <ul>
-            <li><strong>User Queries and Conversations:</strong> When you ask questions or seek guidance through the App, we collect the text or voice input you provide. This includes personal dilemmas, moral questions, and any other content you submit.</li>
-            <li><strong>Voice Recordings:</strong> If you use the voice input feature, we temporarily process your voice recordings to convert speech to text. These recordings are processed in real-time and are not permanently stored by us.</li>
+            <li><strong>User Queries and Conversations:</strong> When you ask questions or seek guidance through the App, we collect the text you provide. This includes personal dilemmas, moral questions, and any other content you submit.</li>
+            <li><strong>Content Reports:</strong> When you choose Send report, we receive the selected response and your reason in our support inbox. Voice input and calling are disabled in this release.</li>
             <li><strong>Saved Conversations:</strong> Saved conversations stay on your device while using a guest session. Creating an account uploads existing saved conversations to our VPS and syncs them across devices.</li>
             <li><strong>Personal Notes and Reflections:</strong> Notes and reflections follow the same storage and account-sync behavior as saved conversations.</li>
         </ul>
@@ -233,7 +233,7 @@
         <ul>
             <li><strong>OpenAI:</strong> Your queries are sent through our VPS to OpenAI to generate guidance.</li>
             <li><strong>Firebase (Google):</strong> If you use Firebase features, your data may be stored and processed by Google Firebase according to their privacy policy.</li>
-            <li><strong>RevenueCat:</strong> Purchase receipts and transaction information are processed to verify token purchases.</li>
+            <li><strong>Direct purchase verification:</strong> Our server verifies Google Play purchase tokens with Google before crediting consumable tokens. This version does not use the RevenueCat SDK.</li>
             <li><strong>Google Play Billing:</strong> Purchase transactions are processed by Google Play according to their terms and privacy policy.</li>
         </ul>
         
@@ -275,13 +275,13 @@
             <li>App preferences and settings</li>
             <li>Daily wisdom cache</li>
         </ul>
-        <p>Guest saved history stays on the device. When you create or sign into an account, existing saved conversations, notes, message history, daily wisdom and preferences sync to our VPS. Local caches and pending changes are separated by account.</p>
+        <p>Guest saved history stays on the device. When you create or sign into an account, existing saved conversations, notes, message history, daily wisdom sync to our VPS. Appearance and notification preferences remain on your device. Local caches and pending changes are separated by account.</p>
         
         <h3>5.2 Server Storage</h3>
         <p>Token balances, purchase records, support contact details/messages and minimal usage events are stored on our VPS for guests and account users. Account users also sync saved app data:</p>
         <ul>
             <li>Authentication identity and migrated device ID</li>
-            <li>Account users: saved conversations, personal notes, message history, daily wisdom and preferences</li>
+            <li>Account users: saved conversations, personal notes, message history, daily wisdom</li>
             <li>Token balances and usage history</li>
             <li>Purchase records</li>
         </ul>
@@ -309,10 +309,10 @@
         </ul>
         
         <h3>6.2 Cloud Data</h3>
-        <p>We retain server data for as long as necessary to provide our services. Private backups may retain earlier copies. Deleting a saved conversation while signed in removes it from active server storage and propagates to other devices. You can request deletion of your cloud data by contacting us (see Contact Us section).</p>
+        <p>We retain active account data until you delete it or your account. Deleting a saved item while signed in removes it from active server storage and propagates to other devices. Account deletion removes your Firebase sign-in account, synced answers, chats, notes, support records and unused token balance. Private database backups expire within 30 days. We retain only hashed identity, device and purchase identifiers to prevent replayed purchases and repeated welcome credits. These retained hashes do not contain conversation text, email addresses or purchase amounts. Google Play retains its own transaction records under its policies. If an external authentication request fails, the app clearly identifies that deletion is incomplete and supports retry; erased app data is never restored.</p>
         
         <h3>6.3 Third-Party Data</h3>
-        <p>Data processed by third-party services (OpenAI, Firebase, RevenueCat and Google Play) is retained according to their respective privacy policies and terms of service.</p>
+        <p>Data processed by third-party services (OpenAI, Firebase and Google Play) is retained according to their respective privacy policies and terms of service.</p>
         
         <div class="section-divider"></div>
         
@@ -324,7 +324,7 @@
         <p>You have the right to access the personal information we hold about you. You can view your saved conversations directly in the App.</p>
         
         <h3>7.2 Deletion</h3>
-        <p>You can delete your saved conversations at any time through the App. To delete cloud data, please contact us.</p>
+        <p>You can delete individual saved items in the App. To permanently delete your account, open Menu → Account &amp; sync → Delete account, confirm your password and review the loss of unused tokens. You can also <a href="account-deletion.html">delete your account on the web</a> or contact admin@ericksolutions.co.ke for deletion assistance. Deletion cannot be undone. The account cache on the device used to delete is removed; local copies on other devices are cleared by signing out or removing the app. Prepared public daily readings and device-local appearance/notification preferences are not private account content.</p>
         
         <h3>7.3 Correction</h3>
         <p>You can edit or update your saved conversations and notes directly in the App.</p>
@@ -394,7 +394,7 @@
             month: 'long', 
             day: 'numeric' 
         });
-        document.getElementById('current-date').textContent = dateStr;
+
         document.getElementById('current-year').textContent = now.getFullYear();
     </script>
 </body>

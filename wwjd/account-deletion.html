@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Delete your account — WWJD Reflections</title>
+<style>body{margin:0;background:#faf6ee;color:#19233e;font:17px/1.6 system-ui,sans-serif}main{max-width:640px;margin:50px auto;padding:28px}h1{font:700 36px/1.2 Georgia,serif}label{display:block;margin-top:20px}input{display:block;box-sizing:border-box;width:100%;padding:14px;border:1px solid #c7c4bb;border-radius:10px;font:inherit}button{margin-top:24px;padding:14px 22px;font:inherit;border:0;border-radius:12px;background:#19233e;color:white;cursor:pointer}button:disabled{opacity:.5}#erase{background:#9b2633}#result{white-space:pre-wrap}a{color:#54430d}</style></head>
+<body><main><p>WWJD REFLECTIONS</p><h1>Delete your account</h1>
+<p>You can delete your WWJD Reflections account here or in the app under <strong>Menu → Account &amp; sync → Delete account</strong>.</p>
+<p>Deletion permanently removes your sign-in account, synced answers, chats, notes and support records. Unused tokens are forfeited. It cannot be undone. Private backups expire within 30 days. Hashed identity, device and purchase records are retained only to prevent repeated credits. Google Play retains its own transaction records.</p>
+<p>If a deletion is interrupted, retry on this page or in the app. App data already erased will not be restored. If you cannot sign in, <a href="mailto:admin@ericksolutions.co.ke?subject=WWJD%20account%20deletion">request deletion help by email</a> from your account address.</p>
+<form id="form"><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button id="signin">Sign in to continue</button></form>
+<section id="confirmation" hidden><h2>Confirm permanent deletion</h2><p id="identity"></p><p>Your account data and unused tokens will be removed permanently.</p><button id="erase">Permanently delete account</button><button id="cancel">Cancel</button></section>
+<p id="result" role="status" aria-live="polite"></p><p><a href="privacy-policy.html">Privacy policy</a></p></main>
+<script src="backend/firebase-config.js"></script><script>
+const api='https://67.211.211.236/wwjd/v2';
+let token='',ticket='',uid='',busy=false;
+const $=id=>document.getElementById(id);
+async function request(url,method,body,auth){
+ const response=await fetch(url,{method,headers:{'Content-Type':'application/json',...(auth?{Authorization:'Bearer '+auth}:{})},body:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
+ const data=await response.json();if(!response.ok)throw Error(data.error?.message||data.error||'Request failed.');return data;
+}
+function setBusy(value){busy=value;for(const id of ['signin','erase','cancel'])$(id).disabled=value;}
+async function status(){const saved=JSON.parse(sessionStorage.getItem('wwjd-deletion')||'null');if(!saved)return false;const state=await request(api+'/account/deletion-status','POST',{ticket:saved.ticket});if(state.completed){sessionStorage.removeItem('wwjd-deletion');$('result').textContent='Your WWJD account and active app data have been deleted.';$('form').hidden=true;$('confirmation').hidden=true;return true;}return false;}
+$('form').addEventListener('submit',async event=>{
+ event.preventDefault();if(busy)return;setBusy(true);$('result').textContent='Checking your account…';
+ try{
+  if(await status())return;
+  const signed=await request('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+encodeURIComponent(window.WWJD_FIREBASE_CONFIG.apiKey),'POST',{email:$('email').value.trim(),password:$('password').value,returnSecureToken:true});
+  token=signed.idToken;uid=signed.localId;$('password').value='';
+  const saved=JSON.parse(sessionStorage.getItem('wwjd-deletion')||'null');
+  if(saved){if(saved.uid!==uid)throw Error('Sign in to the account that started deletion.');ticket=saved.ticket;}
+  else ticket=(await request(api+'/account/deletion-ticket','POST',{},token)).ticket;
+  $('identity').textContent='Account: '+signed.email;$('form').hidden=true;$('confirmation').hidden=false;$('result').textContent='Review the deletion details above before confirming.';
+ }catch(error){$('result').textContent='Unable to continue. Check your sign-in details and connection, or contact support. No password is stored.';$('password').value='';}
+ finally{setBusy(false);}
+});
+$('cancel').onclick=()=>{token='';ticket='';uid='';$('confirmation').hidden=true;$('form').hidden=false;$('result').textContent='Deletion canceled.';};
+$('erase').onclick=async()=>{
+ if(busy)return;setBusy(true);sessionStorage.setItem('wwjd-deletion',JSON.stringify({ticket,uid}));$('result').textContent='Deleting your account…';
+ try{await request(api+'/account','DELETE',{ticket,confirm:true},token);await status();token='';}
+ catch(error){try{if(await status())return;}catch{}$('result').textContent='Deletion is not yet confirmed. App data may already be erased. Sign in again and retry, or contact support.';$('confirmation').hidden=true;$('form').hidden=false;token='';}
+ finally{setBusy(false);}
+};
+</script></body></html>
