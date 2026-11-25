@@ -51,11 +51,23 @@
     chart('dailyChart',M.series(state.usage.filter(entry=>entry.delta<0),entry=>M.day(entry.createdAt),entry=>-entry.delta),'Tokens spent per day');
   }
   function renderUsers() {
-    const filtered = state.users.filter(user=>M.matches([user.id,user.deviceId,...(user.devices||[])],$('search').value)).sort((a,b)=>String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
+    const filtered = M.userGroups(state.users, $('search').value);
     $('userRows').replaceChildren();
-    for (const user of paginate('usersPagination',filtered,usersPage,value=>{usersPage=value;},renderUsers)) cellRow($('userRows'),[
-      accountLink(user.id,user.deviceId),user.balance,date(user.createdAt),date(user.updatedAt),user.messageSendCount || 0,link('View / edit account',M.accountURL(user.id)),
-    ]);
+    for (const group of paginate('usersPagination',filtered,usersPage,value=>{usersPage=value;},renderUsers)) {
+      const [user] = group.users;
+      if (group.users.length === 1) {
+        cellRow($('userRows'),[link(group.label,M.accountURL(user.id)),user.balance,date(user.createdAt),date(user.updatedAt),user.messageSendCount || 0,link('View / edit account',M.accountURL(user.id))]);
+        continue;
+      }
+      const details = node('details'), accounts = node('ul');
+      details.append(node('summary', `View ${group.users.length} accounts`), accounts);
+      for (const record of group.users) {
+        const item = node('li');
+        item.append(link(record.id, M.accountURL(record.id)), node('span', ` · ${record.balance} tokens · ${date(record.createdAt)}`));
+        accounts.appendChild(item);
+      }
+      cellRow($('userRows'),[group.label, '—', '—', '—', '—', details]);
+    }
     if (!filtered.length) emptyTable($('userRows'),6,'No users found.');
   }
   function renderUsage() {
@@ -123,7 +135,7 @@
   function renderAccount(updateForm = true) {
     const data = accountData, account = data.account; $('accountDetails').replaceChildren(); $('accountNotice').textContent='';
     const days = account.createdAt ? Math.max(0,Math.floor((Date.now()-new Date(account.createdAt).getTime())/86400000)) : null;
-    for (const [label,value] of [['Account ID',account.id],['Primary device',account.deviceId],['Linked devices',data.devices.join(', ') || '—'],['Current balance',account.balance],['Message count',account.messageSendCount || 0],['Created',date(account.createdAt)],['Updated',date(account.updatedAt)],['Days since created',days],['Daily wisdom allowance date',account.freeWisdomDate]]) {
+    for (const [label,value] of [['Account ID',account.id],['Account email',account.email],['Primary device',account.deviceId],['Linked devices',data.devices.join(', ') || '—'],['Current balance',account.balance],['Message count',account.messageSendCount || 0],['Created',date(account.createdAt)],['Updated',date(account.updatedAt)],['Days since created',days],['Daily wisdom allowance date',account.freeWisdomDate]]) {
       const dl=node('dl'); dl.append(node('dt',label),node('dd',value)); $('accountDetails').appendChild(dl);
     }
     if (updateForm) { $('accountBalance').value=account.balance; $('accountMessageCount').value=account.messageSendCount || 0; $('accountReason').value=''; accountDirty=false; }

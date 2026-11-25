@@ -5,6 +5,18 @@
   const matches = (values, query) => values.some(value => text(value).includes(text(query).trim()));
   const model = {
     day, matches,
+    userGroups(users, query) {
+      const groups = new Map();
+      const ordered = [...users].sort((a, b) =>
+        String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
+      for (const user of ordered) {
+        const key = !user.email && user.deviceId ? 'device:' + user.deviceId : 'account:' + user.id;
+        if (!groups.has(key)) groups.set(key, { label: user.email || user.deviceId || user.id, users: [] });
+        groups.get(key).users.push(user);
+      }
+      return [...groups.values()].filter(group => group.users.some(user =>
+        matches([user.email, user.id, user.deviceId, ...(user.devices || [])], query)));
+    },
     accountURL: (id, contactId) => `index.html#account=${encodeURIComponent(id)}${contactId ? '&fromContact='+encodeURIComponent(contactId) : ''}`,
     contactURL: id => `index.html#view=support&contact=${encodeURIComponent(id)}`,
     page(items, number, size = 10) { const pages = Math.max(1,Math.ceil(items.length/size)), current = Math.max(1,Math.min(number,pages)); return { items:items.slice((current-1)*size,current*size), current,pages,total:items.length }; },
